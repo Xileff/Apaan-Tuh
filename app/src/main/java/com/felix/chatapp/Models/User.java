@@ -1,4 +1,4 @@
-package com.felix.chatapp.Model;
+package com.felix.chatapp.Models;
 
 public class User {
     private String id, username, imageURL;
