@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/colorPrimary"
     tools:context=".StartActivity">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Chat App"
         android:textSize="25sp"
+        android:textColor="@color/white"
         android:textStyle="bold" />
 
     <Button
@@ -20,12 +22,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:text="Login" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:id="@+id/register"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:text="Register"
         />
 

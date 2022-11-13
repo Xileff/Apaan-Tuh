@@ -51,6 +51,7 @@
             android:id="@+id/btn_login"
             android:background="@color/colorPrimaryDark"
             android:textColor="@color/white"
+            android:text="Log In"
             />
     </LinearLayout>
 
