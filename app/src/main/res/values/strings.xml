@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ChatApp</string>
+    <string name="databaseURL">https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app/</string>
 </resources>
