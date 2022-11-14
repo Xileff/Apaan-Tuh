@@ -49,7 +49,13 @@ public class UsersFragment extends Fragment {
 
     private void readUsers() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users");
+        DatabaseReference reference;
+
+        try {
+            reference = FirebaseDatabase.getInstance(getContext().getString(R.string.databaseURL)).getReference("Users");
+        } catch (Exception e) {
+            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
+        }
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
