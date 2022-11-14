@@ -38,7 +38,7 @@ public class UsersFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         mUsers = new ArrayList<>();
 
@@ -51,11 +51,13 @@ public class UsersFragment extends Fragment {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference;
 
-        try {
-            reference = FirebaseDatabase.getInstance(getContext().getString(R.string.databaseURL)).getReference("Users");
-        } catch (Exception e) {
-            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
-        }
+//        try {
+//            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+//        } catch (Exception e) {
+//            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
+//        }
+
+        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -74,7 +76,7 @@ public class UsersFragment extends Fragment {
                     }
                 }
 
-                userAdapter = new UserAdapter(getContext(), mUsers);
+                userAdapter = new UserAdapter(requireContext(), mUsers);
                 recyclerView.setAdapter(userAdapter);
             }
 
