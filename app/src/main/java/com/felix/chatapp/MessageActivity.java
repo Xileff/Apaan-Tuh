@@ -60,12 +60,7 @@ public class MessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(getApplicationContext(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
         recyclerView = findViewById(R.id.chats_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -95,7 +90,9 @@ public class MessageActivity extends AppCompatActivity {
                 if (user.getImageURL().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
-                    Glide.with(MessageActivity.this).load(user.getImageURL()).into(profile_image);
+                    if (!MessageActivity.this.isFinishing()) {
+                        Glide.with(MessageActivity.this).load(user.getImageURL()).into(profile_image);
+                    }
                 }
 
                 readMessages(fUser.getUid(), userId, user.getImageURL());
@@ -107,17 +104,14 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String message = textSend.getText().toString();
-                if (!message.equals("")) {
-                    sendMessage(fUser.getUid(), userId, message);
-                } else {
-                    Toast.makeText(MessageActivity.this, "Can't send empty message", Toast.LENGTH_SHORT).show();
-                }
-                textSend.setText("");
+        btnSend.setOnClickListener(view -> {
+            String message = textSend.getText().toString();
+            if (!message.equals("")) {
+                sendMessage(fUser.getUid(), userId, message);
+            } else {
+                Toast.makeText(MessageActivity.this, "Can't send empty message", Toast.LENGTH_SHORT).show();
             }
+            textSend.setText("");
         });
     }
 
@@ -149,6 +143,7 @@ public class MessageActivity extends AppCompatActivity {
 
                     messageAdapter = new MessageAdapter(MessageActivity.this, mChats, imageUrl);
                     recyclerView.setAdapter(messageAdapter);
+                    recyclerView.scrollToPosition(mChats.size() - 1);
                 }
             }
 
@@ -157,5 +152,26 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void status(String status) {
+        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
+
+        reference.updateChildren(hashMap);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        status("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        status("offline");
     }
 }

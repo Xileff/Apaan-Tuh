@@ -22,10 +22,12 @@ public class UserAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private List<User> mUsers;
+    private boolean isChat;
 
-    public UserAdapter(Context mContext, List<User> mUsers) {
+    public UserAdapter(Context mContext, List<User> mUsers, boolean isChat) {
         this.mUsers = mUsers;
         this.mContext = mContext; //Context depends from the activity which calls this constructor
+        this.isChat = isChat;
     }
 
     @NonNull
@@ -51,13 +53,27 @@ public class UserAdapter extends RecyclerView.Adapter {
             Glide.with(mContext).load(user.getImageURL()).into(userItem.profile_image);
         }
 
+        if (isChat) {
+            if (user.getStatus().equals("online")) {
+                ((ViewHolder) holder).img_online.setVisibility(View.VISIBLE);
+                ((ViewHolder) holder).img_offline.setVisibility(View.GONE);
+            } else {
+                ((ViewHolder) holder).img_online.setVisibility(View.GONE);
+                ((ViewHolder) holder).img_offline.setVisibility(View.VISIBLE);
+            }
+        } else {
+            ((ViewHolder) holder).img_online.setVisibility(View.GONE);
+            ((ViewHolder) holder).img_offline.setVisibility(View.GONE);
+        }
+
 //      When a contact is clicked, go to MessageActivity with the contact's detail
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, MessageActivity.class);
                 intent.putExtra("userId", user.getId());
-                mContext.startActivity(intent);
+//                Buggy?
+                mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             }
         });
     }
@@ -72,11 +88,14 @@ public class UserAdapter extends RecyclerView.Adapter {
 
         public TextView username;
         public ImageView profile_image;
+        protected ImageView img_online, img_offline;
 
         public ViewHolder(View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.username);
             profile_image = itemView.findViewById(R.id.profile_image);
+            img_online = itemView.findViewById(R.id.img_online);
+            img_offline = itemView.findViewById(R.id.img_offline);
         }
     }
 }

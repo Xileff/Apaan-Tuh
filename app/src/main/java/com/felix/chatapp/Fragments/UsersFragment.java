@@ -38,10 +38,12 @@ public class UsersFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        if (isAdded() && getActivity() != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        }
 
         mUsers = new ArrayList<>();
-
         readUsers();
 
         return view;
@@ -51,39 +53,38 @@ public class UsersFragment extends Fragment {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference;
 
-//        try {
-//            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
-//        } catch (Exception e) {
-//            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
-//        }
+        if (isAdded() && getActivity() != null) {
+            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
 
-        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                mUsers.clear();
+            reference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    mUsers.clear();
 
 //                Loop through all users from reference
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        User user = dataSnapshot.getValue(User.class);
 
-                    assert user != null;
-                    assert firebaseUser != null;
+                        assert user != null;
+                        assert firebaseUser != null;
 
-                    if (!user.getId().equals(firebaseUser.getUid())) {
-                        mUsers.add(user);
+                        if (!user.getId().equals(firebaseUser.getUid())) {
+                            mUsers.add(user);
+                        }
+                    }
+
+//              Buggy
+                    if (isAdded() && getActivity() != null) {
+                        userAdapter = new UserAdapter(requireContext(), mUsers, false);
+                        recyclerView.setAdapter(userAdapter);
                     }
                 }
 
-                userAdapter = new UserAdapter(requireContext(), mUsers);
-                recyclerView.setAdapter(userAdapter);
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                }
+            });
+        }
     }
 }

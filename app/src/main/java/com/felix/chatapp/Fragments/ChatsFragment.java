@@ -44,18 +44,18 @@ public class ChatsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        if (isAdded() && getActivity() != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        }
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         chatUidList = new ArrayList<>();
 
-//        try {
-//            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Chats");
-//        } catch (Exception e) {
-//            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
-//        }
+        if (isAdded() && getActivity() != null) {
+            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Chats");
+        }
 
-        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -89,13 +89,9 @@ public class ChatsFragment extends Fragment {
     private void readChats() {
         mUsers = new ArrayList<>();
 
-//        try {
-//            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
-//        } catch (Exception e) {
-//            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users");
-//        }
-
-        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+        if (isAdded() && getActivity() != null) {
+            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+        }
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -118,8 +114,10 @@ public class ChatsFragment extends Fragment {
                     if (!mUsers.contains(user)) mUsers.add(user);
                 }
 
-                userAdapter = new UserAdapter(requireContext(), mUsers);
-                recyclerView.setAdapter(userAdapter);
+                if (isAdded() && getActivity() != null) {
+                    userAdapter = new UserAdapter(requireContext(), mUsers, true);
+                    recyclerView.setAdapter(userAdapter);
+                }
             }
 
             @Override
