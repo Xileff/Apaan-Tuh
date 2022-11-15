@@ -33,36 +33,35 @@ public class RegisterActivity extends AppCompatActivity {
     DatabaseReference reference;
 
     private void register(String username, String email, String password) {
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser firebaseUser = auth.getCurrentUser();
-                        String userId = firebaseUser.getUid();
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                    FirebaseUser firebaseUser = auth.getCurrentUser();
+                    String userId = firebaseUser.getUid();
 
-                        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
+                    reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
 
-                        HashMap<String, String> hashMap = new HashMap<>();
-                        hashMap.put("id", userId);
-                        hashMap.put("username", username);
-                        hashMap.put("search", username.toLowerCase(Locale.ROOT));
-                        hashMap.put("imageURL", "default");
-                        hashMap.put("status", "default");
+                    HashMap<String, String> hashMap = new HashMap<>();
+                    hashMap.put("id", userId);
+                    hashMap.put("username", username);
+                    hashMap.put("search", username.toLowerCase(Locale.ROOT));
+                    hashMap.put("imageURL", "default");
+                    hashMap.put("status", "default");
 
-                        reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                    finish();
-                                }
+                    reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
                             }
-                        });
-                    } else {
-                        Toast.makeText(RegisterActivity.this, "You can't register with this email or password", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        }
+                    });
+                } else {
+                    Toast.makeText(RegisterActivity.this, "You can't register with this email or password", Toast.LENGTH_SHORT).show();
+                }
+        });
     }
 
     @Override

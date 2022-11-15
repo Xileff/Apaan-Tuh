@@ -51,6 +51,8 @@ public class MessageActivity extends AppCompatActivity {
 
     Intent intent;
 
+    ValueEventListener seenListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,7 @@ public class MessageActivity extends AppCompatActivity {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {
                     if (!MessageActivity.this.isFinishing()) {
-                        Glide.with(MessageActivity.this).load(user.getImageURL()).into(profile_image);
+                        Glide.with(getApplicationContext()).load(user.getImageURL()).into(profile_image);
                     }
                 }
 
@@ -122,6 +124,7 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("sender", sender);
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
+        hashMap.put("isSeen", false);
 
         reference.child("Chats").push().setValue(hashMap);
     }
@@ -152,6 +155,31 @@ public class MessageActivity extends AppCompatActivity {
 
             }
         });
+
+        seenMessage(userId);
+    }
+
+    private void seenMessage(String userId) {
+        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Chats");
+        seenListener = reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Chat chat = data.getValue(Chat.class);
+
+                    if (chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userId)) {
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("isSeen", true);
+                        data.getRef().updateChildren(hashMap);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void status(String status) {
@@ -172,6 +200,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        reference.removeEventListener(seenListener);
         status("offline");
     }
 }

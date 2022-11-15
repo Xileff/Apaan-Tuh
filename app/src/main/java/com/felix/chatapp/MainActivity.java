@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 //                  Prevent crashing after pressing back button in Toolbar from MessageActivity
                     if (!MainActivity.this.isFinishing()){
-                        Glide.with(MainActivity.this).load(user.getImageURL()).into(profileImage);
+                        Glide.with(getApplicationContext()).load(user.getImageURL()).into(profileImage);
                     }
                 }
             }

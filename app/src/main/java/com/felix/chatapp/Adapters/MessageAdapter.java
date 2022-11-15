@@ -1,5 +1,6 @@
 package com.felix.chatapp.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return new MessageAdapter.ViewHolder(chatBubble);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChats.get(position);
@@ -55,6 +57,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.profile_image.setImageResource(R.mipmap.ic_launcher);
         } else {
             Glide.with(mContext).load(imageUrl).into(holder.profile_image);
+        }
+
+//        Only need to show delivered/seen on chat_item_right. chat_item_left doesnt have text_seen
+        if (holder.text_seen == null) return;
+        if (position == mChats.size() - 1) {
+            if (chat.getIsSeen()) {
+                holder.text_seen.setText("Seen");
+            }
+
+            else {
+                holder.text_seen.setText("Delivered");
+            }
+        } else {
+            holder.text_seen.setVisibility(View.GONE);
         }
     }
 
@@ -78,11 +94,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         public TextView showMessage;
         public ImageView profile_image;
+        public TextView text_seen;
 
         public ViewHolder(View itemView) {
             super(itemView);
             showMessage = itemView.findViewById(R.id.show_message);
             profile_image = itemView.findViewById(R.id.profile_image);
+            text_seen = itemView.findViewById(R.id.text_seen);
         }
     }
 }
