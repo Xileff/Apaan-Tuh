@@ -7,9 +7,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.felix.chatapp.Adapters.UserAdapter;
 import com.felix.chatapp.Models.User;
@@ -20,16 +24,22 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public class UsersFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> mUsers;
+    private EditText searchUsers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +56,24 @@ public class UsersFragment extends Fragment {
         mUsers = new ArrayList<>();
         readUsers();
 
+        searchUsers = view.findViewById(R.id.search_users);
+        searchUsers.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                searchUsers(charSequence.toString().toLowerCase(Locale.ROOT));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         return view;
     }
 
@@ -59,8 +87,9 @@ public class UsersFragment extends Fragment {
             reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    mUsers.clear();
+                    if (!searchUsers.getText().toString().equals("")) return;
 
+                    mUsers.clear();
 //                Loop through all users from reference
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         User user = dataSnapshot.getValue(User.class);
@@ -86,5 +115,39 @@ public class UsersFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void searchUsers(String charSequence){
+        if (!isAdded() && getActivity() == null) return;
+
+        String currentUid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        Query query = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users")
+                .orderByChild("search")
+                .startAt(charSequence)
+                .endAt(charSequence + "\uf8ff");
+//      Firebase haven't added support to case insensitive search yet
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mUsers.clear();
+
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    User user = data.getValue(User.class);
+                    if (!user.getId().equals(currentUid)) {
+                        mUsers.add(user);
+                    }
+                }
+
+                if (!isAdded() && getActivity() == null) return;
+                userAdapter = new UserAdapter(requireContext(), mUsers, false);
+                recyclerView.setAdapter(userAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
