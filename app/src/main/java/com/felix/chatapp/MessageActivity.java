@@ -167,7 +167,7 @@ public class MessageActivity extends AppCompatActivity {
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Chat chat = data.getValue(Chat.class);
 
-                    if (chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userId)) {
+                    if (chat.getReceiver().equals(fUser.getUid()) && chat.getSender().equals(userId) && !isFinishing()) {
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put("isSeen", true);
                         data.getRef().updateChildren(hashMap);
