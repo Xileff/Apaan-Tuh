@@ -13,8 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.felix.chatapp.MessageActivity;
+import com.felix.chatapp.Models.Chat;
 import com.felix.chatapp.Models.User;
 import com.felix.chatapp.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -23,6 +31,8 @@ public class UserAdapter extends RecyclerView.Adapter {
     private Context mContext;
     private List<User> mUsers;
     private boolean isChat;
+
+    private String theLastMessage;
 
     public UserAdapter(Context mContext, List<User> mUsers, boolean isChat) {
         this.mUsers = mUsers;
@@ -48,22 +58,25 @@ public class UserAdapter extends RecyclerView.Adapter {
 
         userItem.username.setText(user.getUsername());
         if (user.getImageURL().equals("default")) {
-            (userItem).profile_image.setImageResource(R.mipmap.ic_launcher);
+            (userItem).profileImage.setImageResource(R.mipmap.ic_launcher);
         } else {
-            Glide.with(mContext).load(user.getImageURL()).into(userItem.profile_image);
+            Glide.with(mContext).load(user.getImageURL()).into(userItem.profileImage);
         }
 
         if (isChat) {
+            showLastMessage(user.getId(), ((ViewHolder) holder).lastMessage);
+
             if (user.getStatus().equals("online")) {
-                ((ViewHolder) holder).img_online.setVisibility(View.VISIBLE);
-                ((ViewHolder) holder).img_offline.setVisibility(View.GONE);
+                ((ViewHolder) holder).imgOnline.setVisibility(View.VISIBLE);
+                ((ViewHolder) holder).imgOffline.setVisibility(View.GONE);
             } else {
-                ((ViewHolder) holder).img_online.setVisibility(View.GONE);
-                ((ViewHolder) holder).img_offline.setVisibility(View.VISIBLE);
+                ((ViewHolder) holder).imgOnline.setVisibility(View.GONE);
+                ((ViewHolder) holder).imgOffline.setVisibility(View.VISIBLE);
             }
         } else {
-            ((ViewHolder) holder).img_online.setVisibility(View.GONE);
-            ((ViewHolder) holder).img_offline.setVisibility(View.GONE);
+            ((ViewHolder) holder).imgOnline.setVisibility(View.GONE);
+            ((ViewHolder) holder).imgOffline.setVisibility(View.GONE);
+            ((ViewHolder) holder).lastMessage.setVisibility(View.GONE);
         }
 
 //      When a contact is clicked, go to MessageActivity with the contact's detail
@@ -87,15 +100,43 @@ public class UserAdapter extends RecyclerView.Adapter {
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView username;
-        public ImageView profile_image;
-        protected ImageView img_online, img_offline;
+        public ImageView profileImage;
+        protected ImageView imgOnline, imgOffline;
+        private TextView lastMessage;
 
         public ViewHolder(View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.username);
-            profile_image = itemView.findViewById(R.id.profile_image);
-            img_online = itemView.findViewById(R.id.img_online);
-            img_offline = itemView.findViewById(R.id.img_offline);
+            profileImage = itemView.findViewById(R.id.profile_image);
+            imgOnline = itemView.findViewById(R.id.img_online);
+            imgOffline = itemView.findViewById(R.id.img_offline);
+            lastMessage = itemView.findViewById(R.id.last_message);
         }
+    }
+
+    private void showLastMessage(String userId, TextView txtLastMessage) {
+        theLastMessage = "default";
+        FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Chat c = data.getValue(Chat.class);
+                    if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId) || c.getSender().equals(fUser.getUid()) && c.getReceiver().equals(userId)) {
+                        theLastMessage = c.getMessage();
+                    }
+                }
+
+                txtLastMessage.setText(theLastMessage.equals("default") ? "No message" : theLastMessage);
+                theLastMessage = "default";
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
