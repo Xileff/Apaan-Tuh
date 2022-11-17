@@ -44,7 +44,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
     CircleImageView imageProfile;
-    TextView username;
+    TextView name;
 
     DatabaseReference reference;
     FirebaseUser fUser;
@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         imageProfile = view.findViewById(R.id.profile_image);
-        username = view.findViewById(R.id.username);
+        name = view.findViewById(R.id.name);
 
         storageReference = FirebaseStorage.getInstance().getReference("Uploads");
 
@@ -74,7 +74,7 @@ public class ProfileFragment extends Fragment {
                 User user = snapshot.getValue(User.class);
 
                 assert user != null;
-                username.setText(user.getUsername());
+                name.setText(user.getName());
 
                 if (user.getImageURL().equals("default")) {
                     imageProfile.setImageResource(R.mipmap.ic_launcher);

@@ -36,7 +36,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MessageActivity extends AppCompatActivity {
 
     CircleImageView profile_image;
-    TextView username;
+    TextView name;
 
     FirebaseUser fUser;
     DatabaseReference reference;
@@ -70,7 +70,7 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         profile_image = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
+        name = findViewById(R.id.name);
         textSend = findViewById(R.id.text_send);
         btnSend = findViewById(R.id.btn_send);
 
@@ -88,7 +88,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //              When the app received the contact's data snapshot from Firebase
                 User user = snapshot.getValue(User.class);
-                username.setText(user.getUsername());
+                name.setText(user.getName());
                 if (user.getImageURL().equals("default")) {
                     profile_image.setImageResource(R.mipmap.ic_launcher);
                 } else {

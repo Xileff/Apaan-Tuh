@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.felix.chatapp.Adapters.UserAdapter;
+import com.felix.chatapp.Adapters.UserItemAdapter;
 import com.felix.chatapp.Models.Chat;
 import com.felix.chatapp.Models.User;
 import com.felix.chatapp.R;
@@ -29,7 +29,7 @@ import java.util.List;
 public class ChatsFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private UserAdapter userAdapter;
+    private UserItemAdapter userItemAdapter;
     private List<User> mUsers; // Will contain all the users whom we have chat with
 
     FirebaseUser fUser;
@@ -116,8 +116,8 @@ public class ChatsFragment extends Fragment {
                 }
 
                 if (isAdded() && getActivity() != null) {
-                    userAdapter = new UserAdapter(requireContext(), mUsers, true);
-                    recyclerView.setAdapter(userAdapter);
+                    userItemAdapter = new UserItemAdapter(requireContext(), mUsers, true);
+                    recyclerView.setAdapter(userItemAdapter);
                 }
             }
 

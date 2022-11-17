@@ -9,13 +9,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.felix.chatapp.Adapters.UserAdapter;
+import com.felix.chatapp.Adapters.UserItemAdapter;
 import com.felix.chatapp.Models.User;
 import com.felix.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,16 +27,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 
 public class UsersFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private UserAdapter userAdapter;
+    private UserItemAdapter userItemAdapter;
     private List<User> mUsers;
     private EditText searchUsers;
 
@@ -104,8 +101,8 @@ public class UsersFragment extends Fragment {
 
 //              Buggy
                     if (isAdded() && getActivity() != null) {
-                        userAdapter = new UserAdapter(requireContext(), mUsers, false);
-                        recyclerView.setAdapter(userAdapter);
+                        userItemAdapter = new UserItemAdapter(requireContext(), mUsers, false);
+                        recyclerView.setAdapter(userItemAdapter);
                     }
                 }
 
@@ -140,8 +137,8 @@ public class UsersFragment extends Fragment {
                 }
 
                 if (!isAdded() && getActivity() == null) return;
-                userAdapter = new UserAdapter(requireContext(), mUsers, false);
-                recyclerView.setAdapter(userAdapter);
+                userItemAdapter = new UserItemAdapter(requireContext(), mUsers, false);
+                recyclerView.setAdapter(userItemAdapter);
             }
 
             @Override

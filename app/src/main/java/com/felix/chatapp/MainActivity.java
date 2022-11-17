@@ -33,7 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity {
 
     CircleImageView profileImage;
-    TextView username;
+    TextView name;
 
     FirebaseUser firebaseUser;
     DatabaseReference reference;
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
 
         profileImage = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
+        name = findViewById(R.id.name);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                equivalent to User user = new User(*attributes*)
                 User user = snapshot.getValue(User.class);
-                username.setText(user.getUsername());
+                name.setText(user.getName());
 
                 if (user.getImageURL().equals("default")) {
                     profileImage.setImageResource(R.mipmap.ic_launcher);
@@ -117,6 +117,12 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return true;
         }
+
+        else if (item.getItemId() == R.id.menu_add_friend) {
+            startActivity(new Intent(MainActivity.this, AddFriendActivity.class));
+            return true;
+        }
+
         return false;
     }
 

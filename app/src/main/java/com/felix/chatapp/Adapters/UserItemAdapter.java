@@ -28,7 +28,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserAdapter extends RecyclerView.Adapter {
+public class UserItemAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private List<User> mUsers;
@@ -36,7 +36,7 @@ public class UserAdapter extends RecyclerView.Adapter {
 
     private String theLastMessage;
 
-    public UserAdapter(Context mContext, List<User> mUsers, boolean isChat) {
+    public UserItemAdapter(Context mContext, List<User> mUsers, boolean isChat) {
         this.mUsers = mUsers;
         this.mContext = mContext; //Context depends from the activity which calls this constructor
         this.isChat = isChat;
@@ -48,7 +48,7 @@ public class UserAdapter extends RecyclerView.Adapter {
 //    onCreateViewHolder is used to inflate the user_item.xml layout
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.user_item, parent, false);
-        return new UserAdapter.ViewHolder(view);
+        return new UserItemAdapter.ViewHolder(view);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class UserAdapter extends RecyclerView.Adapter {
         ViewHolder userItem = (ViewHolder) holder;
         // The data type 'ViewHolder' refers to the inner class below
 
-        userItem.username.setText(user.getUsername());
+        userItem.name.setText(user.getName());
         if (user.getImageURL().equals("default")) {
             (userItem).profileImage.setImageResource(R.mipmap.ic_launcher);
         } else {
@@ -101,13 +101,13 @@ public class UserAdapter extends RecyclerView.Adapter {
 //    Used to hold user_item.xml
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView username, lastMessage;
+        public TextView name, lastMessage;
         public ImageView profileImage, imgOnline, imgOffline;
         public CircleImageView badge;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            username = itemView.findViewById(R.id.username);
+            name = itemView.findViewById(R.id.name);
             profileImage = itemView.findViewById(R.id.profile_image);
             imgOnline = itemView.findViewById(R.id.img_online);
             imgOffline = itemView.findViewById(R.id.img_offline);

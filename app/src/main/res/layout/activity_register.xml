@@ -28,6 +28,14 @@
             ></TextView>
 
         <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Name"
+            app:met_floatingLabel="normal" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,6 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_register"
+            android:background="@drawable/rounded_corners"
             android:backgroundTint="@color/colorPrimaryDark"
             android:textColor="@color/white"
             android:text="Sign Up"

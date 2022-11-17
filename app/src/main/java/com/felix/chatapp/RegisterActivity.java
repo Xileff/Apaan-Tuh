@@ -26,28 +26,29 @@ import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    MaterialEditText username, email, password;
+    MaterialEditText username, name, email, password;
     Button btnRegister;
 
     FirebaseAuth auth;
-    DatabaseReference reference;
+    DatabaseReference userReference, usernameListReference;
 
-    private void register(String username, String email, String password) {
+    private void register(String name, String username, String email, String password) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                     FirebaseUser firebaseUser = auth.getCurrentUser();
                     String userId = firebaseUser.getUid();
 
-                    reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
+                    userReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
 
                     HashMap<String, String> hashMap = new HashMap<>();
                     hashMap.put("id", userId);
+                    hashMap.put("name", name);
                     hashMap.put("username", username);
                     hashMap.put("search", username.toLowerCase(Locale.ROOT));
                     hashMap.put("imageURL", "default");
                     hashMap.put("status", "default");
 
-                    reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
@@ -75,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         username = findViewById(R.id.username);
+        name = findViewById(R.id.name);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         btnRegister = findViewById(R.id.btn_register);
@@ -84,6 +86,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String txt_name = name.getText().toString();
                 String txt_username = username.getText().toString();
                 String txt_email = email.getText().toString();
                 String txt_password = password.getText().toString();
@@ -93,7 +96,7 @@ public class RegisterActivity extends AppCompatActivity {
                 } else if (txt_password.length() < 6) {
                     Toast.makeText(RegisterActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
                 } else {
-                    register(txt_username, txt_email, txt_password);
+                    register(txt_name, txt_username, txt_email, txt_password);
                 }
             }
         });
