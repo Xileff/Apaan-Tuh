@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 //            return true;
 
 //          Option 2
-            startActivity(new Intent(MainActivity.this, StartActivity.class));
+//            startActivity(new Intent(MainActivity.this, StartActivity.class));
             finish();
             return true;
         }

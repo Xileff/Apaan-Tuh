@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
@@ -64,7 +66,7 @@ public class UserAdapter extends RecyclerView.Adapter {
         }
 
         if (isChat) {
-            showLastMessage(user.getId(), ((ViewHolder) holder).lastMessage);
+            showLastMessage(user.getId(), ((ViewHolder) holder).lastMessage, ((ViewHolder) holder).badge);
 
             if (user.getStatus().equals("online")) {
                 ((ViewHolder) holder).imgOnline.setVisibility(View.VISIBLE);
@@ -99,10 +101,9 @@ public class UserAdapter extends RecyclerView.Adapter {
 //    Used to hold user_item.xml
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView username;
-        public ImageView profileImage;
-        protected ImageView imgOnline, imgOffline;
-        private TextView lastMessage;
+        public TextView username, lastMessage;
+        public ImageView profileImage, imgOnline, imgOffline;
+        public CircleImageView badge;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -111,10 +112,11 @@ public class UserAdapter extends RecyclerView.Adapter {
             imgOnline = itemView.findViewById(R.id.img_online);
             imgOffline = itemView.findViewById(R.id.img_offline);
             lastMessage = itemView.findViewById(R.id.last_message);
+            badge = itemView.findViewById(R.id.img_badge);
         }
     }
 
-    private void showLastMessage(String userId, TextView txtLastMessage) {
+    private void showLastMessage(String userId, TextView txtLastMessage, CircleImageView badge) {
         theLastMessage = "default";
         FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
@@ -124,8 +126,16 @@ public class UserAdapter extends RecyclerView.Adapter {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Chat c = data.getValue(Chat.class);
+
+//                    Prevent crashing after logout
+                    if (fUser == null) return;
+
                     if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId) || c.getSender().equals(fUser.getUid()) && c.getReceiver().equals(userId)) {
                         theLastMessage = c.getMessage();
+                    }
+
+                    if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId)) {
+                        badge.setVisibility(c.getIsSeen() ? View.GONE : View.VISIBLE);
                     }
                 }
 

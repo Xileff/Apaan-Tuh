@@ -63,4 +63,14 @@
         android:maxLines="1"
         />
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_badge"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:src="@color/teal_700"
+        android:visibility="gone"
+        />
+
 </RelativeLayout>
