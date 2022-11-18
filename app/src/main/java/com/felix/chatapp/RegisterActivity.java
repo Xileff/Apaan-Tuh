@@ -95,6 +95,8 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
                 } else if (txt_password.length() < 6) {
                     Toast.makeText(RegisterActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                } else if (!txt_username.matches("[a-z0-9]{8,20}")) {
+                    Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain only lowercase alphabet with numbers", Toast.LENGTH_SHORT).show();
                 } else {
                     register(txt_name, txt_username, txt_email, txt_password);
                 }

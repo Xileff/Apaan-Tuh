@@ -26,7 +26,7 @@
             android:layout_weight="8"
             android:layout_marginHorizontal="5dp"
             android:layout_marginVertical="10dp"
-            android:hint="Search by email" />
+            android:hint="Search by username" />
 
         <Button
             android:id="@+id/btn_search"
@@ -98,7 +98,7 @@
                 android:src="@mipmap/ic_launcher"/>
 
             <TextView
-                android:id="@+id/username"
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/profile_image"
@@ -114,7 +114,7 @@
                 android:id="@+id/btn_add_friend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/username"
+                android:layout_below="@id/name"
                 android:background="@drawable/rounded_corners"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:text="Add Friend"
