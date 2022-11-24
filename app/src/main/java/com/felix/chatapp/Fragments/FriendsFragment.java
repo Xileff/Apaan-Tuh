@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -31,7 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class UsersFragment extends Fragment {
+public class FriendsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserItemAdapter userItemAdapter;
@@ -41,7 +40,7 @@ public class UsersFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_users, container, false);
+        View view = inflater.inflate(R.layout.fragment_friends, container, false);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -75,26 +74,39 @@ public class UsersFragment extends Fragment {
     }
 
     private void readUsers() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference;
+        FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+        Query qryAllUsers, qryFriends;
+        ArrayList<String> friendUidList = new ArrayList<>();
 
         if (isAdded() && getActivity() != null) {
-            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+            qryAllUsers = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+            qryFriends = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends");
 
-            reference.addValueEventListener(new ValueEventListener() {
+            qryFriends.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot data : snapshot.getChildren()) {
+                        friendUidList.add(data.getKey());
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            qryAllUsers.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!searchUsers.getText().toString().equals("")) return;
 
                     mUsers.clear();
-//                Loop through all users from reference
+//                Loop through all users from query
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         User user = dataSnapshot.getValue(User.class);
 
-                        assert user != null;
-                        assert firebaseUser != null;
-
-                        if (!user.getId().equals(firebaseUser.getUid())) {
+                        if (!user.getId().equals(fUser.getUid()) && friendUidList.contains(user.getId())) {
                             mUsers.add(user);
                         }
                     }
