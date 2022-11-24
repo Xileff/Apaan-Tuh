@@ -47,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
                     hashMap.put("search", username.toLowerCase(Locale.ROOT));
                     hashMap.put("imageURL", "default");
                     hashMap.put("status", "default");
+                    hashMap.put("friends", "");
 
                     userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -98,6 +99,9 @@ public class RegisterActivity extends AppCompatActivity {
                 } else if (!txt_username.matches("[a-z0-9]{8,20}")) {
                     Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain only lowercase alphabet with numbers", Toast.LENGTH_SHORT).show();
                 } else {
+
+//                  todo : Make username unique
+
                     register(txt_name, txt_username, txt_email, txt_password);
                 }
             }

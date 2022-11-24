@@ -16,7 +16,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.felix.chatapp.Models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,7 +28,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.core.UserWriteRecord;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -36,7 +41,9 @@ public class AddFriendActivity extends AppCompatActivity {
     TextView name;
     RelativeLayout layoutFound, layoutNotFound;
     CircleImageView profileImage;
-
+    String uid, search;
+    FirebaseUser fUser;
+    boolean alreadyAdded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,19 +64,21 @@ public class AddFriendActivity extends AppCompatActivity {
         layoutNotFound = findViewById(R.id.not_found);
         profileImage = findViewById(R.id.profile_image);
 
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+
         btnSearch.setOnClickListener(view -> {
-            String search = searchUsers.getText().toString().toLowerCase(Locale.ROOT);
+            search = searchUsers.getText().toString().toLowerCase(Locale.ROOT);
             if (search.equals("")) {
                 Toast.makeText(AddFriendActivity.this, "Please type the username to search", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users")
-                    .orderByChild("username")
+                    .orderByChild("search")
                     .limitToFirst(1)
                     .equalTo(search);
 
-            query.addValueEventListener(new ValueEventListener() {
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (!snapshot.exists()) {
@@ -79,20 +88,44 @@ public class AddFriendActivity extends AppCompatActivity {
 
                     User user = snapshot.getChildren().iterator().next().getValue(User.class);
 
-                    if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+//                  If we search ourselves
+                    if (user.getId().equals(fUser.getUid())) {
                         showLayoutNotFound();
                         Toast.makeText(AddFriendActivity.this, "You can't add yourself", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
+                    uid = user.getId();
                     name.setText(user.getName());
-                    if (user.getImageURL().equals("default")) {
-                        profileImage.setImageResource(R.mipmap.ic_launcher);
-                    } else {
-                        Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
-                    }
 
-                    showLayoutFound();
+//                  Logic if the user is already added or not
+                    Query checkUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
+                    checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                alreadyAdded = true;
+                                btnAddFriend.setText("Chat");
+                                Toast.makeText(AddFriendActivity.this, search + " is already your friend", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                alreadyAdded = false;
+                                btnAddFriend.setText("Add Friend");
+                                if (user.getImageURL().equals("default")) {
+                                    profileImage.setImageResource(R.mipmap.ic_launcher);
+                                } else {
+                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
+                                }
+                            }
+
+                            showLayoutFound();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
 
                 @Override
@@ -100,6 +133,36 @@ public class AddFriendActivity extends AppCompatActivity {
 
                 }
             });
+        });
+
+//      Listener btnAddFriend
+        btnAddFriend.setOnClickListener(view -> {
+            if (alreadyAdded) {
+                Intent intent = new Intent(AddFriendActivity.this, MessageActivity.class);
+                intent.putExtra("userId", uid);
+                startActivity(intent);
+            } else {
+                DatabaseReference reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            reference.setValue(search).addOnCompleteListener(task -> {
+                                if (!task.isSuccessful()) return;
+
+                                alreadyAdded = true;
+                                btnAddFriend.setText("Chat");
+                                Toast.makeText(AddFriendActivity.this, search + " added succesfully.", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
         });
     }
 
@@ -111,5 +174,11 @@ public class AddFriendActivity extends AppCompatActivity {
     private void showLayoutNotFound() {
         layoutFound.setVisibility(View.GONE);
         layoutNotFound.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        finish();
+        super.onDestroy();
     }
 }
