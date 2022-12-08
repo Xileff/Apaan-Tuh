@@ -31,17 +31,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     FirebaseUser fUser;
 
     public MessageAdapter(Context mContext, List<Chat> mChats, String imageUrl) {
-        this.mContext = mContext; //Context depends from the activity which calls this constructor
+        this.mContext = mContext;
         this.mChats = mChats;
         this.imageUrl = imageUrl;
     }
 
     @NonNull
     @Override
-//    The data type 'ViewHolder' refers to the inner class below
-//    onCreateViewHolder is used to inflate the chat_item_<direction>.xml layout
     public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        int direction = viewType == MSG_TYPE_RIGHT ? R.layout.chat_item_right : R.layout.chat_item_left;
+        int direction = (viewType == MSG_TYPE_RIGHT ? R.layout.chat_item_right : R.layout.chat_item_left);
         View chatBubble = LayoutInflater.from(mContext).inflate(direction, parent, false);
 
         return new MessageAdapter.ViewHolder(chatBubble);

@@ -107,15 +107,15 @@ public class AddFriendActivity extends AppCompatActivity {
                                 alreadyAdded = true;
                                 btnAddFriend.setText("Chat");
                                 Toast.makeText(AddFriendActivity.this, search + " is already your friend", Toast.LENGTH_SHORT).show();
+                                return;
                             }
-                            else {
-                                alreadyAdded = false;
-                                btnAddFriend.setText("Add Friend");
-                                if (user.getImageURL().equals("default")) {
-                                    profileImage.setImageResource(R.mipmap.ic_launcher);
-                                } else {
-                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
-                                }
+
+                            alreadyAdded = false;
+                            btnAddFriend.setText("Add Friend");
+                            if (user.getImageURL().equals("default")) {
+                                profileImage.setImageResource(R.mipmap.ic_launcher);
+                            } else {
+                                Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
                             }
 
                             showLayoutFound();

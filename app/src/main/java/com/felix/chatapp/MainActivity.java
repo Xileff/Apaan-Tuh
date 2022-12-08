@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                equivalent to User user = new User(*attributes*)
                 User user = snapshot.getValue(User.class);
                 name.setText(user.getName());
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
 //                  Prevent crashing after pressing back button in Toolbar from MessageActivity
                     if (!MainActivity.this.isFinishing()){
-                        Glide.with(getApplicationContext()).load(user.getImageURL()).into(profileImage);
+                        Glide.with(MainActivity.this).load(user.getImageURL()).into(profileImage);
                     }
                 }
             }
@@ -92,13 +91,12 @@ public class MainActivity extends AppCompatActivity {
         viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
 
         viewPager.setAdapter(viewPagerAdapter);
-
         tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.menu_activity_main, menu);
         return true;
     }
 
@@ -106,14 +104,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.logout) {
             FirebaseAuth.getInstance().signOut();
-//          Logout still buggy
-//          Option 1
-//            firebaseUser = null;
-//            startActivity(new Intent(getApplicationContext(), StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//            return true;
-
-//          Option 2
-//            startActivity(new Intent(MainActivity.this, StartActivity.class));
             finish();
             return true;
         }

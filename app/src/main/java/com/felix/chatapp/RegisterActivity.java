@@ -25,46 +25,10 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
-
     MaterialEditText username, name, email, password;
     Button btnRegister;
-
     FirebaseAuth auth;
-    DatabaseReference userReference, usernameListReference;
-
-    private void register(String name, String username, String email, String password) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                    FirebaseUser firebaseUser = auth.getCurrentUser();
-                    String userId = firebaseUser.getUid();
-
-                    userReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
-
-                    HashMap<String, String> hashMap = new HashMap<>();
-                    hashMap.put("id", userId);
-                    hashMap.put("name", name);
-                    hashMap.put("username", username);
-                    hashMap.put("search", username.toLowerCase(Locale.ROOT));
-                    hashMap.put("imageURL", "default");
-                    hashMap.put("status", "default");
-                    hashMap.put("friends", "");
-
-                    userReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    });
-                } else {
-                    Toast.makeText(RegisterActivity.this, "You can't register with this email or password", Toast.LENGTH_SHORT).show();
-                }
-        });
-    }
+    DatabaseReference userReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +68,37 @@ public class RegisterActivity extends AppCompatActivity {
 
                     register(txt_name, txt_username, txt_email, txt_password);
                 }
+            }
+        });
+    }
+
+    private void register(String name, String username, String email, String password) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser firebaseUser = auth.getCurrentUser();
+                String userId = firebaseUser.getUid();
+
+                userReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
+
+                HashMap<String, String> hashMap = new HashMap<>();
+                hashMap.put("id", userId);
+                hashMap.put("name", name);
+                hashMap.put("username", username);
+                hashMap.put("search", username.toLowerCase(Locale.ROOT));
+                hashMap.put("imageURL", "default");
+                hashMap.put("status", "default");
+                hashMap.put("friends", "");
+
+                userReference.setValue(hashMap).addOnCompleteListener(task1 -> {
+                    if (task1.isSuccessful()) {
+                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            } else {
+                Toast.makeText(RegisterActivity.this, "You can't register with this email", Toast.LENGTH_SHORT).show();
             }
         });
     }
