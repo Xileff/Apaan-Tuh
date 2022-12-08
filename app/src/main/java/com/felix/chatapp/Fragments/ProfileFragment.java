@@ -187,6 +187,7 @@ public class ProfileFragment extends Fragment {
         previousImage.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
                 StorageReference previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
                 previousImageLocation.delete();
             }

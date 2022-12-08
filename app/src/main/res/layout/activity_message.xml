@@ -40,13 +40,22 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <ImageView
+        android:id="@+id/message_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:background="@color/defaultBackground"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chats_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/bar_layout"
         android:layout_above="@id/message_container"
-        android:background="@color/defaultBackground"
+        android:background="@android:color/transparent"
         />
 
     <RelativeLayout

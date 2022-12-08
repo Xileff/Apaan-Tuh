@@ -16,6 +16,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class MessageActivity extends AppCompatActivity {
     EditText textSend;
 
     FirebaseUser fUser;
-    DatabaseReference reference;
+    DatabaseReference reference, backgroundReference;
 
     MessageAdapter messageAdapter;
     List<Chat> mChats;
@@ -128,6 +129,23 @@ public class MessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.d("(MessageActivity)firebase error : ", error.getMessage());
                 Toast.makeText(MessageActivity.this, "Failed retrieving data, please try again in a few minutes", Toast.LENGTH_LONG).show();
+            }
+        });
+
+//      Background reference
+        backgroundReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(userId).child("backgroundUri");
+        backgroundReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+                ImageView backgroundImage = findViewById(R.id.message_background);
+                String bgUri = snapshot.getValue(String.class);
+                Glide.with(MessageActivity.this).load(bgUri).into(backgroundImage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
@@ -277,6 +295,8 @@ public class MessageActivity extends AppCompatActivity {
                         String mUri = downloadUri.toString();
 
                         reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(userId);
+                        deleteFile(reference, "backgroundUri");
+
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("backgroundUri", mUri);
                         reference.updateChildren(map);
@@ -330,5 +350,22 @@ public class MessageActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    public void deleteFile(DatabaseReference reference, String key) {
+        DatabaseReference previousImage = reference.child(key);
+        previousImage.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+                StorageReference previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
+                previousImageLocation.delete();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Delete error : ", error.getMessage());
+            }
+        });
     }
 }
