@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -143,11 +144,15 @@ public class AddFriendActivity extends AppCompatActivity {
                 startActivity(intent);
             } else {
                 DatabaseReference reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
+                HashMap<String, String> friendData = new HashMap<>();
+                friendData.put("id", uid);
+                friendData.put("backgroundUri", "");
+
                 reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (!snapshot.exists()) {
-                            reference.setValue(search).addOnCompleteListener(task -> {
+                            reference.setValue(friendData).addOnCompleteListener(task -> {
                                 if (!task.isSuccessful()) return;
 
                                 alreadyAdded = true;

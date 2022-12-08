@@ -113,7 +113,6 @@ public class FriendsFragment extends Fragment {
                 .startAt(charSequence)
                 .endAt(charSequence + "\uf8ff");
 
-
         qrySearchUser.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.felix.chatapp.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,7 +51,7 @@ public class ProfileFragment extends Fragment {
     DatabaseReference reference;
     FirebaseUser fUser;
 
-//  Firebase Storage for uploading files
+//  Firebase Storage implementation
     StorageReference storageReference;
     private static final int IMAGE_REQUEST = 1;
     private Uri imageUri;
@@ -63,7 +65,7 @@ public class ProfileFragment extends Fragment {
         imageProfile = view.findViewById(R.id.profile_image);
         name = view.findViewById(R.id.name);
 
-        storageReference = FirebaseStorage.getInstance().getReference("Uploads");
+        storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -135,11 +137,14 @@ public class ProfileFragment extends Fragment {
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
+//                  Delete previous image and upload new image
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
                         reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
+                        deleteFile(reference, "imageURL");
+
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("imageURL", mUri);
                         reference.updateChildren(map);
@@ -175,5 +180,21 @@ public class ProfileFragment extends Fragment {
                 uploadImage();
             }
         }
+    }
+
+    public void deleteFile(DatabaseReference reference, String key) {
+        DatabaseReference previousImage = reference.child(key);
+        previousImage.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                StorageReference previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
+                previousImageLocation.delete();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("Delete error : ", error.getMessage());
+            }
+        });
     }
 }
