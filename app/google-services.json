@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "274918820560",
+    "firebase_url": "https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "chatapp-fc0be",
     "storage_bucket": "chatapp-fc0be.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "274918820560-j5vpm1hgt8v4gjha19slqjo4ghv7gbs9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.felix.chatapp",
+            "certificate_hash": "1b12350858ee60398b27f16b568586f8d0b5c2d9"
+          }
+        },
         {
           "client_id": "274918820560-mcq6u86ujs0ej5vubdn09cvf8q7dgsvq.apps.googleusercontent.com",
           "client_type": 3

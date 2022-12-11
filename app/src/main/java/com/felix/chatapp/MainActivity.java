@@ -19,6 +19,9 @@ import com.felix.chatapp.Fragments.ChatsFragment;
 import com.felix.chatapp.Fragments.ProfileFragment;
 import com.felix.chatapp.Fragments.FriendsFragment;
 import com.felix.chatapp.Models.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
@@ -41,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
     CircleImageView profileImage;
     TextView name;
 
+    FirebaseAuth auth;
     FirebaseUser firebaseUser;
+    GoogleSignInOptions gso;
+    private GoogleSignInClient mGoogleSignInClient;
     DatabaseReference reference;
 
     @Override
@@ -57,17 +63,13 @@ public class MainActivity extends AppCompatActivity {
         name = findViewById(R.id.name);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        try {
-            reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(firebaseUser.getUid());
-        } catch (Exception e) {
-            reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Users").child(firebaseUser.getUid());
-        }
+        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(firebaseUser.getUid());
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
+
                 name.setText(user.getName());
 
                 if (user.getImageURL().equals("default")) {
@@ -109,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.logout) {
-            FirebaseAuth.getInstance().signOut();
+            auth.signOut();
+            mGoogleSignInClient.signOut();
             finish();
             return true;
         }
@@ -125,5 +128,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        auth = FirebaseAuth.getInstance();
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 }

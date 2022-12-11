@@ -58,8 +58,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:23.1.1'
 
     //  Notification v2
-    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    implementation platform('com.google.firebase:firebase-bom:31.1.1') // also used for auth
     implementation 'com.google.firebase:firebase-analytics:21.2.0'
+
+    //   Google auth
+    implementation 'com.google.android.gms:play-services-auth:20.4.0'
 }
 
 //    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
