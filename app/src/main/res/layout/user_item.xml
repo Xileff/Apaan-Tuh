@@ -6,16 +6,16 @@
     android:padding="10dp">
     
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
+        android:id="@+id/profileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/profileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/profile_image"
+        android:layout_toEndOf="@id/profileImage"
         android:layout_marginStart="10dp"
         android:layout_centerVertical="true"
         android:text="username"
@@ -26,8 +26,8 @@
         android:id="@+id/last_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/name"
-        android:layout_toEndOf="@id/profile_image"
+        android:layout_below="@+id/profileName"
+        android:layout_toEndOf="@id/profileImage"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:paddingTop="5dp"

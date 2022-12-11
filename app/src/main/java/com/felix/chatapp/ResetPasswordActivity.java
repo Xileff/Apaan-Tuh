@@ -1,18 +1,14 @@
 package com.felix.chatapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPasswordActivity extends AppCompatActivity {
@@ -32,8 +28,8 @@ public class ResetPasswordActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Reset Password");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        sendEmail = findViewById(R.id.send_email);
-        btnReset = findViewById(R.id.btn_reset_password);
+        sendEmail = findViewById(R.id.inputEmail);
+        btnReset = findViewById(R.id.btnResetPassword);
 
         firebaseAuth = FirebaseAuth.getInstance();
 

@@ -26,7 +26,6 @@ import com.felix.chatapp.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,8 +61,8 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        imageProfile = view.findViewById(R.id.profile_image);
-        name = view.findViewById(R.id.name);
+        imageProfile = view.findViewById(R.id.profileImage);
+        name = view.findViewById(R.id.profileName);
 
         storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
 

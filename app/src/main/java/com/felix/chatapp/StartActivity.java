@@ -40,8 +40,8 @@ public class StartActivity extends AppCompatActivity {
             finish();
         }
 
-        login = findViewById(R.id.login);
-        register = findViewById(R.id.register);
+        login = findViewById(R.id.btnLogin);
+        register = findViewById(R.id.btnRegister);
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -88,8 +88,8 @@ public class UserItemAdapter extends RecyclerView.Adapter {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.name);
-            profileImage = itemView.findViewById(R.id.profile_image);
+            name = itemView.findViewById(R.id.profileName);
+            profileImage = itemView.findViewById(R.id.profileImage);
             lastMessage = itemView.findViewById(R.id.last_message);
             badge = itemView.findViewById(R.id.img_badge);
         }

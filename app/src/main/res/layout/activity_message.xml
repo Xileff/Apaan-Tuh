@@ -22,13 +22,13 @@
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_image"
+                android:id="@+id/profileImage"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 />
 
             <TextView
-                android:id="@+id/name"
+                android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
@@ -43,7 +43,7 @@
     <!-- TODO : Make add/block menu if sender isnt a friend -->
 
     <ImageView
-        android:id="@+id/message_background"
+        android:id="@+id/messageBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -52,16 +52,16 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chats_recycler_view"
+        android:id="@+id/messageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/bar_layout"
-        android:layout_above="@id/message_container"
+        android:layout_above="@id/messageInputContainer"
         android:background="@android:color/transparent"
         />
 
     <RelativeLayout
-        android:id="@+id/message_container"
+        android:id="@+id/messageInputContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
@@ -69,16 +69,16 @@
         android:layout_alignParentBottom="true">
 
         <EditText
-            android:id="@+id/text_send"
+            android:id="@+id/inputMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/btn_send"
+            android:layout_toStartOf="@id/btnSend"
             android:background="@android:color/transparent"
             android:hint="Type a message"/>
 
         <ImageButton
-            android:id="@+id/btn_send"
+            android:id="@+id/btnSend"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_centerVertical="true"

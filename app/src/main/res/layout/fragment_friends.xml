@@ -7,7 +7,7 @@
     tools:context=".Fragments.FriendsFragment">
 
     <EditText
-        android:id="@+id/search_users"
+        android:id="@+id/inputSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
@@ -15,9 +15,9 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_users"/>
+        android:layout_below="@id/inputSearch"/>
 
 </RelativeLayout>

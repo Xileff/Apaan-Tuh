@@ -12,24 +12,27 @@
 
 <!--    Search -->
     <LinearLayout
-        android:id="@+id/search_container"
+        android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
         android:orientation="horizontal"
         android:weightSum="10">
 
-        <EditText
-            android:id="@+id/search_users"
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/inputSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="7"
             android:layout_marginHorizontal="5dp"
             android:layout_marginVertical="10dp"
-            android:hint="Search by username" />
+            app:met_floatingLabel="normal"
+            android:inputType="text"
+            android:hint="Search by username"
+            />
 
         <Button
-            android:id="@+id/btn_search"
+            android:id="@+id/btnSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
@@ -46,19 +49,19 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_container"
+        android:layout_below="@id/searchContainer"
         >
 
 <!--    Not found -->
         <RelativeLayout
-            android:id="@+id/not_found"
+            android:id="@+id/layoutNotFound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:visibility="gone">
 
             <ImageView
-                android:id="@+id/image_not_found"
+                android:id="@+id/imgNotFound"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_centerHorizontal="true"
@@ -69,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/image_not_found"
+                android:layout_below="@+id/imgNotFound"
                 android:layout_centerHorizontal="true"
                 android:padding="10dp"
                 android:text="Not found"
@@ -82,7 +85,7 @@
 
 <!--    Found    -->
         <RelativeLayout
-            android:id="@+id/profile_container"
+            android:id="@+id/profileContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -90,7 +93,7 @@
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_image"
+                android:id="@+id/profileImage"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
@@ -98,10 +101,10 @@
                 android:src="@mipmap/ic_launcher"/>
 
             <TextView
-                android:id="@+id/name"
+                android:id="@+id/profileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/profile_image"
+                android:layout_below="@id/profileImage"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="15dp"
                 android:textColor="@color/colorPrimaryDark"
@@ -111,10 +114,10 @@
                 android:layout_marginBottom="20dp"/>
 
             <Button
-                android:id="@+id/btn_add_friend"
+                android:id="@+id/btnAddFriend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/name"
+                android:layout_below="@id/profileName"
                 android:background="@drawable/rounded_corners"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:text="Add Friend"

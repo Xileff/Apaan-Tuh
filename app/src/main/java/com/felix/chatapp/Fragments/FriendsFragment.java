@@ -17,8 +17,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.felix.chatapp.Adapters.UserItemAdapter;
-import com.felix.chatapp.MainActivity;
-import com.felix.chatapp.MessageActivity;
 import com.felix.chatapp.Models.User;
 import com.felix.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,7 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class FriendsFragment extends Fragment {
 
@@ -49,7 +46,7 @@ public class FriendsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_friends, container, false);
         searchFriends("");
 
-        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
 
         if (isAdded() && getActivity() != null) {
@@ -60,7 +57,7 @@ public class FriendsFragment extends Fragment {
         mUsers = new ArrayList<>();
         readUsers();
 
-        searchUsers = view.findViewById(R.id.search_users);
+        searchUsers = view.findViewById(R.id.inputSearch);
         searchUsers.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

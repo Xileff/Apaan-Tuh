@@ -88,14 +88,14 @@ public class MessageActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
-        recyclerView = findViewById(R.id.chats_recycler_view);
+        recyclerView = findViewById(R.id.messageRecyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
 
-        profileImage = findViewById(R.id.profile_image);
-        name = findViewById(R.id.name);
-        textSend = findViewById(R.id.text_send);
-        btnSend = findViewById(R.id.btn_send);
+        profileImage = findViewById(R.id.profileImage);
+        name = findViewById(R.id.profileName);
+        textSend = findViewById(R.id.inputMessage);
+        btnSend = findViewById(R.id.btnSend);
 
 //      Intent from clicking an userAdapter
         intent = getIntent();
@@ -137,7 +137,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) return;
-                ImageView backgroundImage = findViewById(R.id.message_background);
+                ImageView backgroundImage = findViewById(R.id.messageBackground);
                 String bgUri = snapshot.getValue(String.class);
                 Glide.with(MessageActivity.this).load(bgUri).into(backgroundImage);
             }

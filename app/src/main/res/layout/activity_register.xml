@@ -28,7 +28,7 @@
             ></TextView>
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/name"
+            android:id="@+id/inputName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -36,7 +36,7 @@
             app:met_floatingLabel="normal" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/username"
+            android:id="@+id/inputUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -44,7 +44,7 @@
             app:met_floatingLabel="normal" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/email"
+            android:id="@+id/inputEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -53,7 +53,7 @@
             app:met_floatingLabel="normal" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/password"
+            android:id="@+id/inputPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -64,11 +64,11 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_register"
+            android:id="@+id/btnRegister"
             android:background="@drawable/rounded_corners"
             android:backgroundTint="@color/colorPrimaryDark"
             android:textColor="@color/white"
-            android:text="Sign Up"
+            android:text="Register"
             />
             />
     </LinearLayout>

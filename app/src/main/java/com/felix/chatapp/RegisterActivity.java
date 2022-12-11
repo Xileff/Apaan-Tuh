@@ -1,20 +1,15 @@
 package com.felix.chatapp;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -40,11 +35,11 @@ public class RegisterActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Register");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        username = findViewById(R.id.username);
-        name = findViewById(R.id.name);
-        email = findViewById(R.id.email);
-        password = findViewById(R.id.password);
-        btnRegister = findViewById(R.id.btn_register);
+        username = findViewById(R.id.inputUsername);
+        name = findViewById(R.id.inputName);
+        email = findViewById(R.id.inputEmail);
+        password = findViewById(R.id.inputPassword);
+        btnRegister = findViewById(R.id.btnRegister);
 
         auth = FirebaseAuth.getInstance();
 
