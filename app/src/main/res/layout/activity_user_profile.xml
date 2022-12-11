@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="8dp"
-    android:background="@android:color/transparent"
-    tools:context=".Fragments.ProfileFragment">
+    android:gravity="center_horizontal"
+    tools:context=".UserProfile">
+
+    <include
+        layout="@layout/bar_layout"
+        android:id="@+id/toolbar"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_below="@id/toolbar"
+        android:padding="8dp"
+        android:gravity="center"
+        >
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImage"
@@ -37,48 +44,36 @@
             android:textSize="18sp"
             />
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/inputStatus"
+        <TextView
+            android:id="@+id/profileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/profileName"
             android:layout_centerHorizontal="true"
             android:layout_marginVertical="15dp"
-            android:hint="Status"
-            app:met_floatingLabel="normal"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/black"
+            android:text="status"
+            android:textAlignment="center"
             android:textStyle="bold"
             android:textSize="18sp"
             />
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/inputBio"
+        <TextView
+            android:id="@+id/profileBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/inputStatus"
+            android:layout_below="@id/profileStatus"
             android:layout_centerHorizontal="true"
             android:layout_marginVertical="15dp"
-            android:hint="Bio"
-            app:met_floatingLabel="normal"
-            android:textColor="@color/colorPrimaryDark"
+            android:text="bio"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="18sp"
             android:lines="5"
             />
 
-        <Button
-            android:id="@+id/btnUpdateProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/inputBio"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:text="Update profile"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            />
-
     </RelativeLayout>
+
 
 </RelativeLayout>

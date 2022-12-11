@@ -31,14 +31,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddFriendActivity extends AppCompatActivity {
 
-    Button btnSearch, btnAddFriend;
-    EditText searchUsers;
-    TextView name;
-    RelativeLayout layoutFound, layoutNotFound;
-    CircleImageView profileImage;
-    String uid, search;
-    FirebaseUser fUser;
-    boolean alreadyAdded = false;
+    private Button btnSearch, btnAddFriend;
+    private EditText searchUsers;
+    private TextView name, status, bio;
+    private RelativeLayout layoutFound, layoutNotFound;
+    private CircleImageView profileImage;
+    private String uid, search;
+    private FirebaseUser fUser;
+    private boolean alreadyAdded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +55,8 @@ public class AddFriendActivity extends AppCompatActivity {
         btnAddFriend = findViewById(R.id.btnAddFriend);
         searchUsers = findViewById(R.id.inputSearch);
         name = findViewById(R.id.profileName);
+        status = findViewById(R.id.profileStatus);
+        bio = findViewById(R.id.profileBio);
         layoutFound = findViewById(R.id.profileContainer);
         layoutNotFound = findViewById(R.id.layoutNotFound);
         profileImage = findViewById(R.id.profileImage);
@@ -92,6 +94,8 @@ public class AddFriendActivity extends AppCompatActivity {
 
                     uid = user.getId();
                     name.setText(user.getName());
+                    status.setText(user.getStatus());
+                    bio.setText(user.getBio());
 
 //                  Logic if the user is already added or not
                     Query checkUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
@@ -101,6 +105,7 @@ public class AddFriendActivity extends AppCompatActivity {
                             if (snapshot.exists()) {
                                 alreadyAdded = true;
                                 btnAddFriend.setText("Chat");
+                                showLayoutFound();
                                 Toast.makeText(AddFriendActivity.this, search + " is already your friend", Toast.LENGTH_SHORT).show();
                                 return;
                             }
@@ -112,7 +117,6 @@ public class AddFriendActivity extends AppCompatActivity {
                             } else {
                                 Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
                             }
-
                             showLayoutFound();
                         }
 

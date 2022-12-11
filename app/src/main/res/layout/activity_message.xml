@@ -20,7 +20,7 @@
             android:background="@color/colorPrimaryDark"
             android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/MenuStyle"
-            android:paddingVertical="2dp"
+            android:paddingVertical="4dp"
             >
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 />
 

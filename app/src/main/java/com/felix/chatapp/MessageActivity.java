@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -51,23 +52,23 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MessageActivity extends AppCompatActivity {
 
-    CircleImageView profileImage;
-    TextView name;
-    ImageButton btnSend;
-    EditText textSend;
+    private CircleImageView profileImage;
+    private TextView name;
+    private ImageButton btnSend;
+    private EditText textSend;
 
-    FirebaseUser fUser;
-    DatabaseReference reference, backgroundReference;
+    private FirebaseUser fUser;
+    private DatabaseReference reference, backgroundReference;
 
-    MessageAdapter messageAdapter;
-    List<Chat> mChats;
+    private MessageAdapter messageAdapter;
+    private List<Chat> mChats;
     private String userId;
 
-    RecyclerView recyclerView;
+    private RecyclerView recyclerView;
 
-    Intent intent;
+    private Intent intent;
 
-    ValueEventListener seenListener;
+    private ValueEventListener seenListener;
 
     //  Firebase Storage implementation
     StorageReference storageReference;
@@ -132,7 +133,7 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-//      Background reference
+//      Chat background reference
         backgroundReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(userId).child("backgroundUri");
         backgroundReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -147,6 +148,17 @@ public class MessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+//      Show receiver profile
+        profileImage.setOnClickListener(view -> {
+            Intent showReceiverProfile = new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId);
+            startActivity(showReceiverProfile);
+        });
+
+        name.setOnClickListener(view -> {
+            Intent showReceiverProfile = new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId);
+            startActivity(showReceiverProfile);
         });
 
         btnSend.setOnClickListener(view -> {

@@ -12,11 +12,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,14 +43,19 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
-    CircleImageView imageProfile;
-    TextView name;
+    private CircleImageView imageProfile;
+    private TextView name;
+    private MaterialEditText inputStatus, inputBio;
+    private Button btnUpdateProfile;
 
     DatabaseReference reference;
     FirebaseUser fUser;
@@ -61,21 +71,51 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        imageProfile = view.findViewById(R.id.profileImage);
-        name = view.findViewById(R.id.profileName);
-
-        storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
-
         fUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        imageProfile = view.findViewById(R.id.profileImage);
+        name = view.findViewById(R.id.profileName);
+        inputStatus = view.findViewById(R.id.inputStatus);
+        inputBio = view.findViewById(R.id.inputBio);
+        btnUpdateProfile = view.findViewById(R.id.btnUpdateProfile);
+
+//      Set button update to visible
+        ArrayList<MaterialEditText> inputs = new ArrayList<>();
+        inputs.add(inputStatus);
+        inputs.add(inputBio);
+
+        for (MaterialEditText editText : inputs) {
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    btnUpdateProfile.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
+        }
+
+//      Load & update profile
+        storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
         reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-
                 if (user == null) return;
+
                 name.setText(user.getName());
+                inputBio.setText(user.getBio());
+                inputStatus.setText(user.getStatus());
+                btnUpdateProfile.setVisibility(View.GONE);
 
                 if (user.getImageURL().equals("default")) {
                     imageProfile.setImageResource(R.drawable.nophoto);
@@ -92,12 +132,17 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        imageProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openImage();
-            }
+        btnUpdateProfile.setOnClickListener(view1 -> {
+            String status = inputStatus.getText().toString();
+            String bio = inputBio.getText().toString();
+
+            HashMap<String, Object> profile = new HashMap<>();
+            profile.put("status", status);
+            profile.put("bio", bio);
+            reference.updateChildren(profile);
         });
+
+        imageProfile.setOnClickListener(view1 -> openImage());
 
         return view;
     }

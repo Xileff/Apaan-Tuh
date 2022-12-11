@@ -118,11 +118,35 @@
                 android:textSize="18sp"
                 android:layout_marginBottom="20dp"/>
 
+            <TextView
+                android:id="@+id/profileStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileName"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="5dp"
+                android:textColor="@color/black"
+                android:text="status"
+                android:textSize="15sp"
+                />
+
+            <TextView
+                android:id="@+id/profileBio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileStatus"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/black"
+                android:text="bio"
+                android:textSize="15sp"
+                android:layout_marginBottom="20dp"/>
+
             <Button
                 android:id="@+id/btnAddFriend"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/profileName"
+                android:layout_below="@id/profileBio"
                 android:background="@drawable/rounded_corners"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:text="Add Friend"
