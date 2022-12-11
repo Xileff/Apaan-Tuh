@@ -9,32 +9,36 @@
         android:id="@+id/profileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@mipmap/ic_launcher"/>
+        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_width="0.5dp"
+        android:src="@drawable/nophoto"/>
 
-    <TextView
-        android:id="@+id/profileName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/profileImage"
-        android:layout_marginStart="10dp"
+        android:orientation="vertical"
         android:layout_centerVertical="true"
-        android:text="username"
-        android:textSize="11sp"
-        />
-
-    <TextView
-        android:id="@+id/last_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/profileName"
-        android:layout_toEndOf="@id/profileImage"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:paddingTop="5dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:maxLines="1"
-        android:visibility="gone"
-        />
+        >
+        <TextView
+            android:id="@+id/profileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="username"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            />
+        <TextView
+            android:id="@+id/last_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:maxLines="1"
+            android:visibility="gone"
+            />
+    </LinearLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_badge"

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".AboutDevActivity"
     android:gravity="center_horizontal"
+    android:background="@drawable/chatbackground"
     >
 
     <include
@@ -26,8 +27,8 @@
             android:id="@+id/title_about_dev"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Developer"
-            android:textSize="20sp"
+            android:text="Developer Profile"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:textAlignment="center"
             />

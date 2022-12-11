@@ -56,7 +56,7 @@ public class UserItemAdapter extends RecyclerView.Adapter {
 
         userItem.name.setText(user.getName());
         if (user.getImageURL().equals("default")) {
-            (userItem).profileImage.setImageResource(R.mipmap.ic_launcher);
+            (userItem).profileImage.setImageResource(R.drawable.nophoto);
         } else {
             Glide.with(mContext).load(user.getImageURL()).into(userItem.profileImage);
         }

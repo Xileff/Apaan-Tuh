@@ -92,7 +92,7 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
 
-        profileImage = findViewById(R.id.profileImage);
+        profileImage = findViewById(R.id.activityMessageProfileImage);
         name = findViewById(R.id.profileName);
         textSend = findViewById(R.id.inputMessage);
         btnSend = findViewById(R.id.btnSend);
@@ -113,7 +113,8 @@ public class MessageActivity extends AppCompatActivity {
                 User user = snapshot.getValue(User.class);
                 name.setText(user.getName());
                 if (user.getImageURL().equals("default")) {
-                    profileImage.setImageResource(R.mipmap.ic_launcher);
+                    Log.d("imageURL", user.getImageURL());
+                    profileImage.setImageResource(R.drawable.nophoto_white);
                 } else {
                     if (!MessageActivity.this.isFinishing()) {
                         Glide.with(MessageActivity.this).load(user.getImageURL()).into(profileImage);

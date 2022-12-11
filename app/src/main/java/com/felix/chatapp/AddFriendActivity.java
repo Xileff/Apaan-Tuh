@@ -108,7 +108,7 @@ public class AddFriendActivity extends AppCompatActivity {
                             alreadyAdded = false;
                             btnAddFriend.setText("Add Friend");
                             if (user.getImageURL().equals("default")) {
-                                profileImage.setImageResource(R.mipmap.ic_launcher);
+                                profileImage.setImageResource(R.drawable.nophoto);
                             } else {
                                 Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
                             }
