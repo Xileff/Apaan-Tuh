@@ -81,6 +81,7 @@ public class FriendsFragment extends Fragment {
         return view;
     }
 
+//  Invoked in create cycle, to store friends uid in a list
     private void readUsers() {
         Query qryFriends;
         friendUidList = new ArrayList<>();
@@ -108,6 +109,8 @@ public class FriendsFragment extends Fragment {
     private void searchFriends(String charSequence){
         if (!isAdded() && getActivity() == null) return;
 
+        Log.d("Charsequence", charSequence);
+
         Query qrySearchUser = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users")
                 .orderByChild("search")
                 .startAt(charSequence)
@@ -126,6 +129,7 @@ public class FriendsFragment extends Fragment {
                 }
 
                 if (!isAdded() && getActivity() == null) return;
+//              Update useritemadapter and recyclerview
                 userItemAdapter = new UserItemAdapter(requireContext(), mUsers, false);
                 recyclerView.setAdapter(userItemAdapter);
             }
@@ -136,5 +140,11 @@ public class FriendsFragment extends Fragment {
                 Toast.makeText(requireContext(), "Failed retrieving data, please try again in a few minutes", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        searchFriends("");
     }
 }
