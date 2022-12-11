@@ -6,10 +6,4 @@
         android:title="Change background"
         app:showAsAction="never"
         />
-
-    <item
-        android:id="@+id/remove_friend"
-        android:title="Remove friend"
-        app:showAsAction="never"
-        />
 </menu>

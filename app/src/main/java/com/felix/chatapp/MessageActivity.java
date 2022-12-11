@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -156,6 +155,7 @@ public class MessageActivity extends AppCompatActivity {
                 return;
             }
             sendMessage(fUser.getUid(), userId, message);
+
             textSend.setText("");
         });
     }
@@ -227,33 +227,21 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void updateStatus(String status) {
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
-
-        reference.updateChildren(hashMap);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        updateStatus("online");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         reference.removeEventListener(seenListener);
-        updateStatus("offline");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         reference.removeEventListener(seenListener);
-        updateStatus("offline");
     }
 
     private void openImage() {
@@ -344,8 +332,6 @@ public class MessageActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_change_background:
                 openImage();
-                return true;
-            case R.id.remove_friend:
                 return true;
         }
 

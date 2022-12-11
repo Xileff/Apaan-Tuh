@@ -38,25 +38,21 @@ public class UserItemAdapter extends RecyclerView.Adapter {
 
     public UserItemAdapter(Context mContext, List<User> mUsers, boolean isChat) {
         this.mUsers = mUsers;
-        this.mContext = mContext; //Context depends from the activity which calls this constructor
+        this.mContext = mContext;
         this.isChat = isChat;
     }
 
     @NonNull
     @Override
-//    The data type 'ViewHolder' refers to the inner class below
-//    onCreateViewHolder is used to inflate the user_item.xml layout
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.user_item, parent, false);
         return new UserItemAdapter.ViewHolder(view);
     }
 
     @Override
-//    For binding each contact(user_item.xml) on the RecyclerView
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         User user = mUsers.get(position);
         ViewHolder userItem = (ViewHolder) holder;
-        // The data type 'ViewHolder' refers to the inner class below
 
         userItem.name.setText(user.getName());
         if (user.getImageURL().equals("default")) {
@@ -66,30 +62,15 @@ public class UserItemAdapter extends RecyclerView.Adapter {
         }
 
         if (isChat) {
+            ((ViewHolder) holder).lastMessage.setVisibility(View.VISIBLE);
             showLastMessage(user.getId(), ((ViewHolder) holder).lastMessage, ((ViewHolder) holder).badge);
-
-            if (user.getStatus().equals("online")) {
-                ((ViewHolder) holder).imgOnline.setVisibility(View.VISIBLE);
-                ((ViewHolder) holder).imgOffline.setVisibility(View.GONE);
-            } else {
-                ((ViewHolder) holder).imgOnline.setVisibility(View.GONE);
-                ((ViewHolder) holder).imgOffline.setVisibility(View.VISIBLE);
-            }
-        } else {
-            ((ViewHolder) holder).imgOnline.setVisibility(View.GONE);
-            ((ViewHolder) holder).imgOffline.setVisibility(View.GONE);
-            ((ViewHolder) holder).lastMessage.setVisibility(View.GONE);
         }
 
 //      When a contact is clicked, go to MessageActivity with the contact's detail
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("userId", user.getId());
-//                Buggy?
-                mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            }
+        holder.itemView.setOnClickListener(view -> {
+            Intent intent = new Intent(mContext, MessageActivity.class);
+            intent.putExtra("userId", user.getId());
+            mContext.startActivity(intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         });
     }
 
@@ -98,49 +79,47 @@ public class UserItemAdapter extends RecyclerView.Adapter {
         return mUsers.size();
     }
 
-//    Used to hold user_item.xml
+//    user_item.xml
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView name, lastMessage;
-        public ImageView profileImage, imgOnline, imgOffline;
+        public ImageView profileImage;
         public CircleImageView badge;
 
         public ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name);
             profileImage = itemView.findViewById(R.id.profile_image);
-            imgOnline = itemView.findViewById(R.id.img_online);
-            imgOffline = itemView.findViewById(R.id.img_offline);
             lastMessage = itemView.findViewById(R.id.last_message);
             badge = itemView.findViewById(R.id.img_badge);
         }
     }
 
     private void showLastMessage(String userId, TextView txtLastMessage, CircleImageView badge) {
-        theLastMessage = "default";
+        theLastMessage = "";
         FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (fUser == null) return;
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Chat c = data.getValue(Chat.class);
 
-//                    Prevent crashing after logout
-                    if (fUser == null) return;
-
+//                  Show last message
                     if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId) || c.getSender().equals(fUser.getUid()) && c.getReceiver().equals(userId)) {
                         theLastMessage = c.getMessage();
                     }
 
+//                  Show/hide badge
                     if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId)) {
                         badge.setVisibility(c.getIsSeen() ? View.GONE : View.VISIBLE);
                     }
                 }
 
-                txtLastMessage.setText(theLastMessage.equals("default") ? "No message" : theLastMessage);
-                theLastMessage = "default";
+                txtLastMessage.setText(theLastMessage);
+                theLastMessage = "";
             }
 
             @Override

@@ -8,6 +8,12 @@
         />
 
     <item
+        android:id="@+id/menu_about_dev"
+        android:title="Developer"
+        app:showAsAction="never"
+        />
+
+    <item
         android:id="@+id/logout"
         android:title="Log out"
         app:showAsAction="never"

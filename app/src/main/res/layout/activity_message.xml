@@ -40,6 +40,8 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- TODO : Make add/block menu if sender isnt a friend -->
+
     <ImageView
         android:id="@+id/message_background"
         android:layout_width="match_parent"

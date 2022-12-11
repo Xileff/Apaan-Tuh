@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AboutDevActivity"
+    android:gravity="center_horizontal"
+    >
+
+    <include
+        layout="@layout/bar_layout"
+        android:id="@+id/toolbar"/>
+
+    <LinearLayout
+        android:id="@+id/container_biodata"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="75dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="30sp"
+        >
+
+        <TextView
+            android:id="@+id/title_about_dev"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Developer"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_about_dev"
+            android:layout_width="155dp"
+            android:layout_height="155dp"
+            android:layout_marginVertical="10dp"
+            android:src="@drawable/dev"
+            />
+
+        <TextView
+            android:id="@+id/text_about_dev"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hello, my name is Felix Savero.\n\nI am an IT undergraduate student at Ukrida.\n\nI am passionate about computer technology, and my hobby is building PC.\n\nI am also interested in exploring new ideas and finding ways to apply them to the field of IT. I am very excited to be part of this program, and I am looking forward to the opportunities it will bring\n\nYou can find me on LinkedIn below"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            />
+
+        <ImageButton
+            android:id="@+id/btn_dev_linkedin"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="20dp"
+            android:scaleType="centerCrop"
+            android:background="@color/white"
+            android:src="@drawable/linkedin"
+            />
+
+    </LinearLayout>
+
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/image_about_dev"-->
+<!--        android:layout_width="155dp"-->
+<!--        android:layout_height="155dp"-->
+<!--        android:layout_below="@id/title_about_dev"-->
+<!--        app:cardCornerRadius="250dp">-->
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="150dp"-->
+<!--            android:layout_height="150dp"-->
+<!--            android:layout_gravity="center">-->
+<!--            <ImageView-->
+<!--                android:layout_width="150dp"-->
+<!--                android:layout_height="150dp"-->
+<!--                android:src="@drawable/dev"-->
+<!--                android:scaleType="centerCrop"/>-->
+<!--        </androidx.cardview.widget.CardView>-->
+<!--    </androidx.cardview.widget.CardView>-->
+
+</RelativeLayout>

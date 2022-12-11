@@ -7,9 +7,11 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.felix.chatapp.Adapters.ViewPagerAdapter;
@@ -17,6 +19,8 @@ import com.felix.chatapp.Fragments.ChatsFragment;
 import com.felix.chatapp.Fragments.ProfileFragment;
 import com.felix.chatapp.Fragments.FriendsFragment;
 import com.felix.chatapp.Models.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,7 +29,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -108,32 +114,16 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        else if (item.getItemId() == R.id.menu_about_dev) {
+            startActivity(new Intent(MainActivity.this, AboutDevActivity.class));
+            return true;
+        }
+
         else if (item.getItemId() == R.id.menu_add_friend) {
             startActivity(new Intent(MainActivity.this, AddFriendActivity.class));
             return true;
         }
 
         return false;
-    }
-
-    private void status(String status) {
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(firebaseUser.getUid());
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
-
-        reference.updateChildren(hashMap);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        status("online");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        status("offline");
     }
 }
