@@ -7,6 +7,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -33,65 +34,57 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity {
 
-    CircleImageView profileImage;
-    TextView name;
+    private CircleImageView profileImage;
+    private TextView name;
 
-    FirebaseAuth auth;
-    FirebaseUser firebaseUser;
-    GoogleSignInOptions gso;
+    private FirebaseAuth fAuth;
+    private FirebaseUser fUser;
+
+    private GoogleSignInOptions gso;
     private GoogleSignInClient mGoogleSignInClient;
-    DatabaseReference reference;
+
+    private DatabaseReference fUserReference;
+
+    private final String ACTIVITY_TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        setupToolbar();
+        setupViews();
 
-        profileImage = findViewById(R.id.profileImage);
-        name = findViewById(R.id.profileName);
-
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(firebaseUser.getUid());
-
-        reference.addValueEventListener(new ValueEventListener() {
+        fAuth = FirebaseAuth.getInstance();
+        fUser = fAuth.getCurrentUser();
+        fUserReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                .getReference("Users")
+                .child(fUser.getUid());
+        fUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
 
                 name.setText(user.getName());
-
                 if (user.getImageURL().equals("default")) {
                     profileImage.setImageResource(R.drawable.nophoto_white);
-                } else {
-//                  Prevent crashing after pressing back button in Toolbar from MessageActivity
-                    if (!MainActivity.this.isFinishing()){
-                        Glide.with(MainActivity.this).load(user.getImageURL()).into(profileImage);
-                    }
+                    return;
+                }
+
+//              Prevent crashing
+                if (!MainActivity.this.isFinishing()){
+                    Glide.with(MainActivity.this).load(user.getImageURL()).into(profileImage);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d(ACTIVITY_TAG, error.getMessage());
             }
         });
 
-//        Fragments
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
-        ViewPager viewPager = findViewById(R.id.viewPager);
-
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
-        viewPagerAdapter.addFragment(new FriendsFragment(), "Friends");
-        viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
-
-        viewPager.setAdapter(viewPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
+//      Fragments
+        setupFragments();
     }
 
     @Override
@@ -103,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.logout) {
-            auth.signOut();
+            fAuth.signOut();
             mGoogleSignInClient.signOut();
             finish();
             return true;
@@ -125,11 +118,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        auth = FirebaseAuth.getInstance();
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+    }
+
+    private void setupViews() {
+        profileImage = findViewById(R.id.profileImage);
+        name = findViewById(R.id.profileName);
+    }
+
+    private void setupFragments() {
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        ViewPager viewPager = findViewById(R.id.viewPager);
+//      Initially, there's no fragment in viewpager. Check the layout to see
+
+//      Add fragments to viewPagerAdapter
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
+        viewPagerAdapter.addFragment(new FriendsFragment(), "Friends");
+        viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
+
+//      Combine tabLayout and viewPager
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
     }
 }
