@@ -12,18 +12,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class StartActivity extends AppCompatActivity {
 
-    Button login, register;
-    FirebaseUser firebaseUser;
+    private Button btnLogin, btnRegister;
+    private FirebaseUser fUser;
 
     @Override
     protected void onStart() {
+//      If user didn't log out when closing the app, redirect to MainActivity
         super.onStart();
-
-//        If user didn't log out when closing the app, they will be automatically redirected to MainActivity
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
-            Intent intent = new Intent(StartActivity.this, MainActivity.class);
-            startActivity(intent);
+        fUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (fUser != null) {
+            startActivity(new Intent(StartActivity.this, MainActivity.class));
             finish();
         }
     }
@@ -32,29 +30,9 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
-            Intent intent = new Intent(StartActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-
-        login = findViewById(R.id.btnLogin);
-        register = findViewById(R.id.btnRegister);
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(StartActivity.this, LoginActivity.class));
-            }
-        });
-
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(StartActivity.this, RegisterActivity.class));
-            }
-        });
+        btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister);
+        btnLogin.setOnClickListener(view -> startActivity(new Intent(StartActivity.this, LoginActivity.class)));
+        btnRegister.setOnClickListener(view -> startActivity(new Intent(StartActivity.this, RegisterActivity.class)));
     }
 }

@@ -13,38 +13,32 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
-    EditText sendEmail;
-    Button btnReset;
-
-    FirebaseAuth firebaseAuth;
+    private EditText inputEmail;
+    private Button btnReset;
+    private FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Reset Password");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar("Reset Password");
 
-        sendEmail = findViewById(R.id.inputEmail);
+        inputEmail = findViewById(R.id.inputEmail);
         btnReset = findViewById(R.id.btnResetPassword);
-
-        firebaseAuth = FirebaseAuth.getInstance();
+        fAuth = FirebaseAuth.getInstance();
 
         btnReset.setOnClickListener(view -> {
-            String email = sendEmail.getText().toString();
+            String email = inputEmail.getText().toString();
 
             if (email.equals("")) {
                 Toast.makeText(ResetPasswordActivity.this, "Email can't be blank", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+            fAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
-                    String error = task.getException().getMessage();
-                    Toast.makeText(ResetPasswordActivity.this, error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ResetPasswordActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -52,5 +46,13 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 startActivity(new Intent(ResetPasswordActivity.this, LoginActivity.class));
             });
         });
+    }
+
+    private void setupToolbar(String title) {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(ResetPasswordActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 }

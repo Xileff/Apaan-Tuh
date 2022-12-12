@@ -7,7 +7,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,50 +33,55 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private MaterialEditText email, password;
-    private Button btnLogin, btnLoginGooglee;
+    private MaterialEditText inputEmail, inputPassword;
+    private Button btnLogin;
     private TextView txtForgotPassword;
-
-    private FirebaseAuth auth;
-    private GoogleSignInClient mGoogleSignInClient;
     private SignInButton btnLoginGoogle;
-    private int RC_SIGN_IN = 2;
-    private final String GoogleSignInTag = "Google Sign In";
+
+    private FirebaseAuth fAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+
+    private final int RC_SIGN_IN = 2;
+    private final String GOOGLE_SIGN_IN_TAG = "GOOGLE_SIGN_IN";
+    private final String ACTIVITY_TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Login");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        email = findViewById(R.id.inputEmail);
-        password = findViewById(R.id.inputPassword);
+        setupToolbar("Login");
+        inputEmail = findViewById(R.id.inputEmail);
+        inputPassword = findViewById(R.id.inputPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnLoginGoogle = findViewById(R.id.btnLoginGoogle);
         txtForgotPassword = findViewById(R.id.forgotPassword);
 
+        fAuth = FirebaseAuth.getInstance();
+
 //      Default login
         btnLogin.setOnClickListener(view -> {
-            String txt_email = email.getText().toString();
-            String txt_password = password.getText().toString();
+            String email = inputEmail.getText().toString();
+            String password = inputPassword.getText().toString();
 
-            if (TextUtils.isEmpty(txt_email) || TextUtils.isEmpty(txt_password)) {
+            if (email.equals("") || password.equals("")) {
                 Toast.makeText(LoginActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
-            } else {
-                auth.signInWithEmailAndPassword(txt_email, txt_password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                goToMainActivity();
-                            } else {
-                                Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                return;
             }
+
+            fAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        intentMainActivity();
+                    });
         });
+
+//      Forgot password
+        txtForgotPassword.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class)));
 
 //      Google login
         btnLoginGoogle.setOnClickListener(view -> {
@@ -86,18 +90,8 @@ public class LoginActivity extends AppCompatActivity {
                     .requestEmail()
                     .build();
             mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-            googleSignIn();
+            startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
         });
-
-//      Forgot password
-        txtForgotPassword.setOnClickListener(view -> {
-            startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-        });
-    }
-
-    private void googleSignIn(){
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
@@ -108,66 +102,70 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d(GoogleSignInTag, "firebaseAuthWithGoogle:" + account.getId());
+                Log.d(GOOGLE_SIGN_IN_TAG, "Google Auth:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
-                Log.d(GoogleSignInTag, e.getMessage());
+                Log.d(GOOGLE_SIGN_IN_TAG, e.getMessage());
             }
         }
      }
 
-//   Last method
-     private void firebaseAuthWithGoogle(String idToken) {
+//  Google authentication
+    private void firebaseAuthWithGoogle(String idToken) {
          AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-         auth.signInWithCredential(credential)
+         fAuth.signInWithCredential(credential)
                  .addOnCompleteListener(this, task -> {
-                     if (task.isSuccessful()) {
-                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                         DatabaseReference firebaseUserRef = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(firebaseUser.getUid());
-
-//                       Prevent sign in if account hasnt been registered yet
-                         firebaseUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                             @Override
-                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                 User user = snapshot.getValue(User.class);
-                                 if (user == null) {
-                                     firebaseUser.delete().addOnCompleteListener(task -> {
-                                         if (task.isSuccessful()) {
-                                             auth.signOut();
-                                             mGoogleSignInClient.signOut();
-                                             Toast.makeText(LoginActivity.this, "This gmail is not registered in Apaan Tuh", Toast.LENGTH_SHORT).show();
-                                         }
-                                     });
-                                 }
-                                 else {
-                                     goToMainActivity();
-                                 }
-
-                             }
-
-                             @Override
-                             public void onCancelled(@NonNull DatabaseError error) {
-
-                             }
-                         });
-                     } else {
-                         Log.d(GoogleSignInTag, "signInWithCredential:failed", task.getException());
+                     if (!task.isSuccessful()) {
+                         Log.d(GOOGLE_SIGN_IN_TAG, task.getException().toString());
                          Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+                         return;
                      }
+
+                     FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+                     DatabaseReference fUserRef = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                             .getReference("Users")
+                             .child(fUser.getUid());
+
+//                   Prevent sign in if account hasnt been registered yet
+                     fUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                         @Override
+                         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                             User user = snapshot.getValue(User.class);
+                             if (user == null) {
+                                 fUser.delete().addOnCompleteListener(task -> {
+                                     if (task.isSuccessful()) {
+                                         fAuth.signOut();
+                                         mGoogleSignInClient.signOut();
+                                         Toast.makeText(LoginActivity.this, "This gmail is not registered in Apaan Tuh", Toast.LENGTH_SHORT).show();
+                                     }
+                                 });
+                             } else {
+                                 intentMainActivity();
+                             }
+                         }
+
+                         @Override
+                         public void onCancelled(@NonNull DatabaseError error) {
+                             Log.d(ACTIVITY_TAG, error.getMessage());
+                         }
+                     });
                  });
      }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        auth = FirebaseAuth.getInstance();
-    }
-
-    private void goToMainActivity(){
+    private void intentMainActivity(){
+        // Go to MainActivity and set it as new root activity
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void setupToolbar(String title){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(LoginActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 }
