@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 name.setText(user.getName());
 
                 if (user.getImageURL().equals("default")) {
-                    profileImage.setImageResource(R.drawable.nophoto);
+                    profileImage.setImageResource(R.drawable.nophoto_white);
                 } else {
 //                  Prevent crashing after pressing back button in Toolbar from MessageActivity
                     if (!MainActivity.this.isFinishing()){

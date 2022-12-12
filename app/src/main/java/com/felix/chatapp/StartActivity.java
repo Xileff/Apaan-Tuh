@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class StartActivity extends AppCompatActivity {
-
     private Button btnLogin, btnRegister;
     private FirebaseUser fUser;
 

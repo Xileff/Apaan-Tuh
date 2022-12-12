@@ -32,17 +32,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class LoginActivity extends AppCompatActivity {
-
     private MaterialEditText inputEmail, inputPassword;
     private Button btnLogin;
     private TextView txtForgotPassword;
     private SignInButton btnLoginGoogle;
 
     private FirebaseAuth fAuth;
-    private GoogleSignInClient mGoogleSignInClient;
+    private FirebaseUser fUser;
 
-    private final int RC_SIGN_IN = 2;
+    private GoogleSignInClient mGoogleSignInClient;
+    private final int REQUEST_CODE_GOOGLE_SIGN_IN = 2;
     private final String GOOGLE_SIGN_IN_TAG = "GOOGLE_SIGN_IN";
+
     private final String ACTIVITY_TAG = "LoginActivity";
 
     @Override
@@ -51,11 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         setupToolbar("Login");
-        inputEmail = findViewById(R.id.inputEmail);
-        inputPassword = findViewById(R.id.inputPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnLoginGoogle = findViewById(R.id.btnLoginGoogle);
-        txtForgotPassword = findViewById(R.id.forgotPassword);
+        setupViews();
 
         fAuth = FirebaseAuth.getInstance();
 
@@ -75,7 +72,6 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(LoginActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
                         intentMainActivity();
                     });
         });
@@ -90,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
                     .requestEmail()
                     .build();
             mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-            startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
+            startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_GOOGLE_SIGN_IN);
         });
     }
 
@@ -98,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == REQUEST_CODE_GOOGLE_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -122,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                          return;
                      }
 
-                     FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+                     fUser = fAuth.getCurrentUser();
                      DatabaseReference fUserRef = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
                              .getReference("Users")
                              .child(fUser.getUid());
@@ -167,5 +163,13 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(LoginActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+    }
+
+    private void setupViews() {
+        inputEmail = findViewById(R.id.inputEmail);
+        inputPassword = findViewById(R.id.inputPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnLoginGoogle = findViewById(R.id.btnLoginGoogle);
+        txtForgotPassword = findViewById(R.id.forgotPassword);
     }
 }

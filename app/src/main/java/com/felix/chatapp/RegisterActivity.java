@@ -5,8 +5,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -20,80 +18,90 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class RegisterActivity extends AppCompatActivity {
-    MaterialEditText username, name, email, password;
-    Button btnRegister;
-    FirebaseAuth auth;
-    DatabaseReference userReference;
+    private MaterialEditText inputUsername, inputName, inputEmail, inputPassword;
+    private Button btnRegister;
+    private FirebaseAuth fAuth;
+    private FirebaseUser fUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Register");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setupToolbar("Register");
+        setupViews();
 
-        username = findViewById(R.id.inputUsername);
-        name = findViewById(R.id.inputName);
-        email = findViewById(R.id.inputEmail);
-        password = findViewById(R.id.inputPassword);
-        btnRegister = findViewById(R.id.btnRegister);
+        fAuth = FirebaseAuth.getInstance();
 
-        auth = FirebaseAuth.getInstance();
+        btnRegister.setOnClickListener(view -> {
+            String name = inputName.getText().toString();
+            String username = inputUsername.getText().toString();
+            String email = inputEmail.getText().toString();
+            String password = inputPassword.getText().toString();
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String txt_name = name.getText().toString();
-                String txt_username = username.getText().toString();
-                String txt_email = email.getText().toString();
-                String txt_password = password.getText().toString();
-
-                if (TextUtils.isEmpty(txt_username) || TextUtils.isEmpty(txt_password) || TextUtils.isEmpty(txt_email)) {
-                    Toast.makeText(RegisterActivity.this, "All fields are required", Toast.LENGTH_SHORT).show();
-                } else if (txt_password.length() < 6) {
-                    Toast.makeText(RegisterActivity.this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
-                } else if (!txt_username.matches("[a-z0-9]{8,20}")) {
-                    Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain only lowercase alphabet with numbers", Toast.LENGTH_SHORT).show();
-                } else {
+            if (username.equals("") || password.equals("") || email.equals("")) {
+                Toast.makeText(RegisterActivity.this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+            } else if (password.length() < 8) {
+                Toast.makeText(RegisterActivity.this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show();
+            } else if (!username.matches("[a-z0-9]{8,20}")) {
+                Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain lowercase alphabet with numbers", Toast.LENGTH_SHORT).show();
+            } else {
 
 //                  todo : Make username unique
 
-                    register(txt_name, txt_username, txt_email, txt_password);
-                }
+                register(name, username, email, password);
             }
         });
     }
 
     private void register(String name, String username, String email, String password) {
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser firebaseUser = auth.getCurrentUser();
-                String userId = firebaseUser.getUid();
-
-                userReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
-
-                HashMap<String, String> hashMap = new HashMap<>();
-                hashMap.put("id", userId);
-                hashMap.put("name", name);
-                hashMap.put("username", username);
-                hashMap.put("search", username.toLowerCase(Locale.ROOT));
-                hashMap.put("imageURL", "default");
-                hashMap.put("friends", "");
-
-                userReference.setValue(hashMap).addOnCompleteListener(task1 -> {
-                    if (task1.isSuccessful()) {
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-            } else {
+        fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
                 Toast.makeText(RegisterActivity.this, "You can't register with this email", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            fUser = fAuth.getCurrentUser();
+            String userId = fUser.getUid();
+
+            DatabaseReference userReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                    .getReference("Users")
+                    .child(userId);
+
+            HashMap<String, String> newUser = new HashMap<>();
+            newUser.put("id", userId);
+            newUser.put("name", name);
+            newUser.put("username", username);
+            newUser.put("search", username.toLowerCase(Locale.ROOT));
+            newUser.put("imageURL", "default");
+            newUser.put("friends", "");
+            newUser.put("status", "");
+            newUser.put("bio", "");
+
+            userReference.setValue(newUser).addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful()) {
+                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            });
         });
+    }
+
+    private void setupToolbar(String title){
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(title);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(RegisterActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+    }
+
+    private void setupViews(){
+        inputUsername = findViewById(R.id.inputUsername);
+        inputName = findViewById(R.id.inputName);
+        inputEmail = findViewById(R.id.inputEmail);
+        inputPassword = findViewById(R.id.inputPassword);
+        btnRegister = findViewById(R.id.btnRegister);
     }
 }

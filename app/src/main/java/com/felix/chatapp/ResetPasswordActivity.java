@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPasswordActivity extends AppCompatActivity {
-
     private EditText inputEmail;
     private Button btnReset;
     private FirebaseAuth fAuth;
@@ -23,14 +22,11 @@ public class ResetPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reset_password);
 
         setupToolbar("Reset Password");
+        setupViews();
 
-        inputEmail = findViewById(R.id.inputEmail);
-        btnReset = findViewById(R.id.btnResetPassword);
         fAuth = FirebaseAuth.getInstance();
-
         btnReset.setOnClickListener(view -> {
             String email = inputEmail.getText().toString();
-
             if (email.equals("")) {
                 Toast.makeText(ResetPasswordActivity.this, "Email can't be blank", Toast.LENGTH_SHORT).show();
                 return;
@@ -55,4 +51,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(ResetPasswordActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
+
+    private void setupViews(){
+        inputEmail = findViewById(R.id.inputEmail);
+        btnReset = findViewById(R.id.btnResetPassword);
+    }
 }
+//
