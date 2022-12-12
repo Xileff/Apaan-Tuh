@@ -4,9 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -31,38 +36,29 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AddFriendActivity extends AppCompatActivity {
 
-    private Button btnSearch, btnAddFriend;
+    private Button btnSearch, btnAddFriend, btnChat;
     private EditText searchUsers;
     private TextView name, status, bio;
     private RelativeLayout layoutFound, layoutNotFound;
     private CircleImageView profileImage;
-    private String uid, search;
+
+    private FirebaseAuth fAuth;
     private FirebaseUser fUser;
-    private boolean alreadyAdded = false;
+
+    private String uid, search;
+
+    private final String ACTIVITY_TAG = "AddFriendActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Add friend");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(AddFriendActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        setupToolbar("Add Friend");
+        setupViews();
 
-        btnSearch = findViewById(R.id.btnSearch);
-        btnAddFriend = findViewById(R.id.btnAddFriend);
-        searchUsers = findViewById(R.id.inputSearch);
-        name = findViewById(R.id.profileName);
-        status = findViewById(R.id.profileStatus);
-        bio = findViewById(R.id.profileBio);
-        layoutFound = findViewById(R.id.profileContainer);
-        layoutNotFound = findViewById(R.id.layoutNotFound);
-        profileImage = findViewById(R.id.profileImage);
-
-        fUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        fAuth = FirebaseAuth.getInstance();
+        fUser = fAuth.getCurrentUser();
         btnSearch.setOnClickListener(view -> {
             search = searchUsers.getText().toString().toLowerCase(Locale.ROOT);
             if (search.equals("")) {
@@ -70,7 +66,8 @@ public class AddFriendActivity extends AppCompatActivity {
                 return;
             }
 
-            Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users")
+            Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                    .getReference("Users")
                     .orderByChild("search")
                     .limitToFirst(1)
                     .equalTo(search);
@@ -85,10 +82,8 @@ public class AddFriendActivity extends AppCompatActivity {
 
                     User user = snapshot.getChildren().iterator().next().getValue(User.class);
 
-//                  If we search ourselves
                     if (user.getId().equals(fUser.getUid())) {
-                        showLayoutNotFound();
-                        Toast.makeText(AddFriendActivity.this, "You can't add yourself", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddFriendActivity.this, "You wanna add yourself? That's illogical, sir. Perhaps you're lonely?", Toast.LENGTH_LONG).show();
                         return;
                     }
 
@@ -97,91 +92,140 @@ public class AddFriendActivity extends AppCompatActivity {
                     status.setText(user.getStatus());
                     bio.setText(user.getBio());
 
-//                  Logic if the user is already added or not
-                    Query checkUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
-                    checkUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                    Query qryUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                                        .getReference("Users")
+                                        .child(fUser.getUid())
+                                        .child("friends")
+                                        .child(uid);
+
+                    qryUser.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
-                                alreadyAdded = true;
-                                btnAddFriend.setText("Chat");
                                 showLayoutFound();
+
+                                if (!user.getImageURL().equals("default")) {
+                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
+                                } else {
+                                    profileImage.setImageResource(R.drawable.nophoto_white);
+                                }
                                 Toast.makeText(AddFriendActivity.this, search + " is already your friend", Toast.LENGTH_SHORT).show();
-                                return;
+                                showChatButton();
                             }
 
-                            alreadyAdded = false;
-                            btnAddFriend.setText("Add Friend");
-                            if (user.getImageURL().equals("default")) {
-                                profileImage.setImageResource(R.drawable.nophoto);
-                            } else {
-                                Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
+                            else {
+                                showAddButton();
+                                if (user.getImageURL().equals("default")) {
+                                    profileImage.setImageResource(R.drawable.nophoto);
+                                }
+                                else {
+                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
+                                }
+                                showLayoutFound();
                             }
-                            showLayoutFound();
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
-
+                            Log.d(ACTIVITY_TAG, error.getMessage());
                         }
                     });
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
+                    Log.d(ACTIVITY_TAG, error.getMessage());
                 }
             });
         });
 
-//      Listener btnAddFriend
         btnAddFriend.setOnClickListener(view -> {
-            if (alreadyAdded) {
-                Intent intent = new Intent(AddFriendActivity.this, MessageActivity.class);
-                intent.putExtra("userId", uid);
-                startActivity(intent);
-            } else {
-                DatabaseReference reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(uid);
-                HashMap<String, String> friendData = new HashMap<>();
-                friendData.put("id", uid);
-                friendData.put("backgroundUri", "");
+            DatabaseReference newFriendRef = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                    .getReference("Users")
+                    .child(fUser.getUid())
+                    .child("friends")
+                    .child(uid);
 
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (!snapshot.exists()) {
-                            reference.setValue(friendData).addOnCompleteListener(task -> {
-                                if (!task.isSuccessful()) return;
+            HashMap<String, String> friendData = new HashMap<>();
+            friendData.put("id", uid);
+            friendData.put("backgroundUri", "");
 
-                                alreadyAdded = true;
-                                btnAddFriend.setText("Chat");
-                                Toast.makeText(AddFriendActivity.this, search + " added succesfully.", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
+            newFriendRef.setValue(friendData).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(AddFriendActivity.this, "Couldn't add " + search + ", please try again shortly", Toast.LENGTH_SHORT).show();
+                    Log.d(ACTIVITY_TAG, task.getException().toString());
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AddFriendActivity.this, search + " added succesfully.", Toast.LENGTH_SHORT).show();
+                showChatButton();
+            });
+        });
 
-                    }
-                });
-            }
+        btnChat.setOnClickListener(view -> {
+            Intent intent = new Intent(AddFriendActivity.this, MessageActivity.class);
+            intent.putExtra("userId", uid);
+            startActivity(intent);
         });
     }
 
     private void showLayoutFound(){
         layoutFound.setVisibility(View.VISIBLE);
         layoutNotFound.setVisibility(View.GONE);
+
+        ObjectAnimator animation = ObjectAnimator.ofFloat(layoutFound, "translationY", 100f);
+        animation.setDuration(1000);
+        animation.start();
+
+        closeKeyboard();
     }
 
     private void showLayoutNotFound() {
         layoutFound.setVisibility(View.GONE);
         layoutNotFound.setVisibility(View.VISIBLE);
+        closeKeyboard();
     }
 
     @Override
     protected void onDestroy() {
-        finish();
         super.onDestroy();
+    }
+
+    private void setupViews() {
+        btnSearch = findViewById(R.id.btnSearch);
+        btnAddFriend = findViewById(R.id.btnAddFriend);
+        btnChat = findViewById(R.id.btnChat);
+        searchUsers = findViewById(R.id.inputSearch);
+        name = findViewById(R.id.profileName);
+        status = findViewById(R.id.profileStatus);
+        bio = findViewById(R.id.profileBio);
+        layoutFound = findViewById(R.id.layoutFound);
+        layoutNotFound = findViewById(R.id.layoutNotFound);
+        profileImage = findViewById(R.id.profileImage);
+    }
+
+    private void setupToolbar(String title) {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Add friend");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(AddFriendActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+    }
+
+    private void showAddButton() {
+        btnAddFriend.setVisibility(View.VISIBLE);
+        btnChat.setVisibility(View.GONE);
+    }
+
+    private void showChatButton() {
+        btnAddFriend.setVisibility(View.GONE);
+        btnChat.setVisibility(View.VISIBLE);
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager manager = (InputMethodManager)  getSystemService(Context.INPUT_METHOD_SERVICE);
+            manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

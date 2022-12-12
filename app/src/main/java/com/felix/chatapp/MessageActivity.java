@@ -141,7 +141,10 @@ public class MessageActivity extends AppCompatActivity {
                 if (!snapshot.exists()) return;
                 ImageView backgroundImage = findViewById(R.id.messageBackground);
                 String bgUri = snapshot.getValue(String.class);
-                Glide.with(MessageActivity.this).load(bgUri).into(backgroundImage);
+
+                if (!MessageActivity.this.isFinishing()) {
+                    Glide.with(MessageActivity.this).load(bgUri).into(backgroundImage);
+                }
             }
 
             @Override

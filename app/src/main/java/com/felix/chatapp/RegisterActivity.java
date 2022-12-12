@@ -1,17 +1,23 @@
 package com.felix.chatapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.HashMap;
@@ -22,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private FirebaseAuth fAuth;
     private FirebaseUser fUser;
+    private final String ACTIVITY_TAG = "RegisterActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +55,27 @@ public class RegisterActivity extends AppCompatActivity {
             } else {
 
 //                  todo : Make username unique
+                Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users")
+                        .orderByChild("search")
+                        .limitToFirst(1)
+                        .equalTo(username);
 
-                register(name, username, email, password);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            Toast.makeText(RegisterActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        register(name, username, email, password);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.d(ACTIVITY_TAG, error.getMessage());
+                    }
+                });
             }
         });
     }

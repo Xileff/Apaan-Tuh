@@ -51,15 +51,16 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/searchContainer"
+        android:backgroundTint="@android:color/transparent"
         >
 
 <!--    Not found -->
         <RelativeLayout
             android:id="@+id/layoutNotFound"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="8dp"
             android:visibility="gone">
 
@@ -88,9 +89,9 @@
 
 <!--    Found    -->
         <RelativeLayout
-            android:id="@+id/profileContainer"
+            android:id="@+id/layoutFound"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="8dp"
             android:visibility="gone"
             >
@@ -99,11 +100,11 @@
                 android:id="@+id/profileImage"
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                app:civ_border_color="@color/colorPrimaryDark"
-                app:civ_border_width="0.8dp"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="50dp"
-                android:src="@drawable/nophoto"/>
+                android:src="@drawable/nophoto"
+                app:civ_border_color="@color/colorPrimaryDark"
+                app:civ_border_width="0.8dp" />
 
             <TextView
                 android:id="@+id/profileName"
@@ -112,11 +113,11 @@
                 android:layout_below="@id/profileImage"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="15dp"
-                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginBottom="20dp"
                 android:text="Username"
-                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="18sp"
-                android:layout_marginBottom="20dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/profileStatus"
@@ -125,10 +126,9 @@
                 android:layout_below="@id/profileName"
                 android:layout_centerHorizontal="true"
                 android:layout_marginVertical="5dp"
-                android:textColor="@color/black"
                 android:text="status"
-                android:textSize="15sp"
-                />
+                android:textColor="@color/black"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/profileBio"
@@ -137,10 +137,10 @@
                 android:layout_below="@id/profileStatus"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
-                android:textColor="@color/black"
+                android:layout_marginBottom="20dp"
                 android:text="bio"
-                android:textSize="15sp"
-                android:layout_marginBottom="20dp"/>
+                android:textColor="@color/black"
+                android:textSize="15sp" />
 
             <Button
                 android:id="@+id/btnAddFriend"
@@ -150,9 +150,20 @@
                 android:background="@drawable/rounded_corners"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:text="Add Friend"
-                android:textStyle="bold"
                 android:textColor="@color/white"
-                />
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnChat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileBio"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:text="Chat"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
