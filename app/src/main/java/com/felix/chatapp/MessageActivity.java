@@ -52,69 +52,59 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MessageActivity extends AppCompatActivity {
 
+    private String userId;
+
     private CircleImageView profileImage;
     private TextView name;
     private ImageButton btnSend;
-    private EditText textSend;
+    private EditText inputMessage;
 
     private FirebaseUser fUser;
-    private DatabaseReference reference, backgroundReference;
-
-    private MessageAdapter messageAdapter;
-    private List<Chat> mChats;
-    private String userId;
+    private FirebaseDatabase db;
+    private DatabaseReference receiverReference, chatReference, backgroundReference;
 
     private RecyclerView recyclerView;
+    private MessageAdapter messageAdapter;
+    private List<Chat> mChats;
 
     private Intent intent;
 
     private ValueEventListener seenListener;
 
-    //  Firebase Storage implementation
-    StorageReference storageReference;
-    private static final int IMAGE_REQUEST = 1;
+    //  Firebase Storage
+    private StorageReference storageReference;
+    private static final int REQUEST_CODE_IMAGE = 1;
     private Uri imageUri;
     private StorageTask uploadTask;
+
+    private final String ACTIVITY_TAG = "MessageActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
-        storageReference = FirebaseStorage.getInstance().getReference("Uploads/backgrounds");
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
-
-        recyclerView = findViewById(R.id.messageRecyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
-
-        profileImage = findViewById(R.id.activityMessageProfileImage);
-        name = findViewById(R.id.profileName);
-        textSend = findViewById(R.id.inputMessage);
-        btnSend = findViewById(R.id.btnSend);
-
-//      Intent from clicking an userAdapter
+//      Intent from clicking UserItemAdapter
         intent = getIntent();
         userId = intent.getStringExtra("userId");
-
-//      Our and receiver's reference in firebase
         fUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
 
-//      Listen to changes in the database reference(receiver's data)
-        reference.addValueEventListener(new ValueEventListener() {
+        db = FirebaseDatabase.getInstance(getString(R.string.databaseURL));
+        receiverReference = db.getReference("Users").child(userId);
+        storageReference = FirebaseStorage.getInstance().getReference("Uploads/backgrounds");
+        chatReference = db.getReference("Chats");
+
+        setupToolbar();
+        setupViews();
+
+//      Get receiver profile and read all messages
+        receiverReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //              Set receiver's profile image and name
                 User user = snapshot.getValue(User.class);
                 name.setText(user.getName());
                 if (user.getImageURL().equals("default")) {
-                    Log.d("imageURL", user.getImageURL());
                     profileImage.setImageResource(R.drawable.nophoto_white);
                 } else {
                     if (!MessageActivity.this.isFinishing()) {
@@ -128,13 +118,18 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("(MessageActivity)firebase error : ", error.getMessage());
+                Log.d(ACTIVITY_TAG, error.getMessage());
                 Toast.makeText(MessageActivity.this, "Failed retrieving data, please try again in a few minutes", Toast.LENGTH_LONG).show();
             }
         });
 
-//      Chat background reference
-        backgroundReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(userId).child("backgroundUri");
+//      Get background
+        backgroundReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                .getReference("Users")
+                .child(fUser.getUid())
+                .child("friends")
+                .child(userId)
+                .child("backgroundUri");
         backgroundReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -149,50 +144,43 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d(ACTIVITY_TAG, error.getMessage());
             }
         });
 
-//      Show receiver profile
-        profileImage.setOnClickListener(view -> {
-            Intent showReceiverProfile = new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId);
-            startActivity(showReceiverProfile);
-        });
+//      If we click on receiver's name or image, show their complete profile
+        for (View v : new View[]{profileImage, name}) {
+            v.setOnClickListener(view -> startActivity(new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId)));
+        }
 
-        name.setOnClickListener(view -> {
-            Intent showReceiverProfile = new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId);
-            startActivity(showReceiverProfile);
-        });
-
+//      Send message
         btnSend.setOnClickListener(view -> {
-            String message = textSend.getText().toString();
+            String message = inputMessage.getText().toString();
             if (message.equals("")) {
                 Toast.makeText(MessageActivity.this, "Can't send empty message", Toast.LENGTH_SHORT).show();
                 return;
             }
-            sendMessage(fUser.getUid(), userId, message);
 
-            textSend.setText("");
+            sendMessage(fUser.getUid(), userId, message);
+            inputMessage.setText("");
         });
     }
 
     private void sendMessage(String sender, String receiver, String message) {
-        DatabaseReference reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
+        HashMap<String, Object> chat = new HashMap<>();
 
-        hashMap.put("sender", sender);
-        hashMap.put("receiver", receiver);
-        hashMap.put("message", message);
-        hashMap.put("isSeen", false);
+        chat.put("sender", sender);
+        chat.put("receiver", receiver);
+        chat.put("message", message);
+        chat.put("isSeen", false);
 
-        reference.child("Chats").push().setValue(hashMap);
+        chatReference.push().setValue(chat);
     }
 
     private void readMessages(String myId, String userId, String imageUrl) {
         mChats = new ArrayList<>();
 
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Chats");
-        reference.addValueEventListener(new ValueEventListener() {
+        chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 mChats.clear();
@@ -220,8 +208,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void seenMessage(String userId) {
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Chats");
-        seenListener = reference.addValueEventListener(new ValueEventListener() {
+        seenListener = chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot data : snapshot.getChildren()) {
@@ -237,34 +224,42 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("(MessageActivity)firebase error : ", error.getMessage());
+                Log.d(ACTIVITY_TAG, error.getMessage());
                 Toast.makeText(MessageActivity.this, "Failed retrieving data, please try again in a few minutes", Toast.LENGTH_LONG).show();
             }
         });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
-        reference.removeEventListener(seenListener);
+        chatReference.removeEventListener(seenListener);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        reference.removeEventListener(seenListener);
+        chatReference.removeEventListener(seenListener);
     }
 
     private void openImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, IMAGE_REQUEST);
+        Intent requestImage = new Intent();
+        requestImage.setType("image/*");
+        requestImage.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(requestImage, REQUEST_CODE_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            if (uploadTask != null && uploadTask.isInProgress()) {
+                Toast.makeText(MessageActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
+            } else {
+                uploadImage();
+            }
+        }
     }
 
     private String getFileExtension(Uri uri) {
@@ -278,64 +273,55 @@ public class MessageActivity extends AppCompatActivity {
         pd.setMessage("Uploading");
         pd.show();
 
-        if (imageUri != null) {
-            final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+        if (imageUri == null) {
+            Toast.makeText(MessageActivity.this, "No image selected", Toast.LENGTH_SHORT).show();
+            pd.dismiss();
+            return;
+        }
 
-            uploadTask = fileReference.putFile(imageUri);
-            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    return fileReference.getDownloadUrl();
+        final StorageReference fileReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(imageUri));
+        uploadTask = fileReference.putFile(imageUri);
+        uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        String mUri = downloadUri.toString();
 
-                        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends").child(userId);
-                        deleteFile(reference, "backgroundUri");
+                return fileReference.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    String mUri = downloadUri.toString();
 
-                        HashMap<String, Object> map = new HashMap<>();
-                        map.put("backgroundUri", mUri);
-                        reference.updateChildren(map);
+                    DatabaseReference myFriendUidRef = db.getReference("Users")
+                                                        .child(fUser.getUid())
+                                                        .child("friends")
+                                                        .child(userId);
+                    deleteFile(myFriendUidRef, "backgroundUri");
 
-                        pd.dismiss();
-                    } else {
-                        Toast.makeText(MessageActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                        pd.dismiss();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(MessageActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("backgroundUri", mUri);
+                    myFriendUidRef.updateChildren(map);
+
+                    pd.dismiss();
+                } else {
+                    Log.d(ACTIVITY_TAG, task.getException().toString());
+                    Toast.makeText(MessageActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                     pd.dismiss();
                 }
-            });
-        } else {
-            Toast.makeText(MessageActivity.this, "No image selected", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-
-            if (uploadTask != null && uploadTask.isInProgress()) {
-                Toast.makeText(MessageActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
-            } else {
-                uploadImage();
             }
-        }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(ACTIVITY_TAG, e.getMessage());
+                Toast.makeText(MessageActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                pd.dismiss();
+            }
+        });
     }
 
     @Override
@@ -355,19 +341,38 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     public void deleteFile(DatabaseReference reference, String key) {
-        DatabaseReference previousImage = reference.child(key);
-        previousImage.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference previousImageUri = reference.child(key);
+        previousImageUri.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) return;
-                StorageReference previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
-                previousImageLocation.delete();
+                StorageReference previousImage = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
+                previousImage.delete();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("Delete error : ", error.getMessage());
+                Log.d(ACTIVITY_TAG, error.getMessage());
             }
         });
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+    }
+
+    private void setupViews() {
+        recyclerView = findViewById(R.id.messageRecyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MessageActivity.this));
+
+        profileImage = findViewById(R.id.activityMessageProfileImage);
+        name = findViewById(R.id.profileName);
+        inputMessage = findViewById(R.id.inputMessage);
+        btnSend = findViewById(R.id.btnSend);
     }
 }

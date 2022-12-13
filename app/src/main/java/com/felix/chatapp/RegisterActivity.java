@@ -131,3 +131,4 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
     }
 }
+//

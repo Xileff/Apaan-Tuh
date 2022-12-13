@@ -173,3 +173,4 @@ public class LoginActivity extends AppCompatActivity {
         txtForgotPassword = findViewById(R.id.forgotPassword);
     }
 }
+//

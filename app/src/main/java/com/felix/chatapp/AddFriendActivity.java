@@ -229,3 +229,4 @@ public class AddFriendActivity extends AppCompatActivity {
         }
     }
 }
+//
