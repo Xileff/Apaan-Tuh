@@ -55,7 +55,6 @@ public class FriendsFragment extends Fragment {
 
         fUser = FirebaseAuth.getInstance().getCurrentUser();
         mUsers = new ArrayList<>();
-        readUsers();
 
         searchUsers = view.findViewById(R.id.inputSearch);
         searchUsers.addTextChangedListener(new TextWatcher() {
@@ -79,7 +78,7 @@ public class FriendsFragment extends Fragment {
     }
 
 //  Invoked in create cycle, to store friends uid in a list
-    private void readUsers() {
+    private void getFriendsUid() {
         Query qryFriends;
         friendUidList = new ArrayList<>();
 
@@ -103,15 +102,13 @@ public class FriendsFragment extends Fragment {
         }
     }
 
+//  Reset mUsers based on keyword
     private void searchFriends(String charSequence){
         if (!isAdded() && getActivity() == null) return;
-
-        Log.d("Charsequence", charSequence);
-
         Query qrySearchUser = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users")
-                .orderByChild("search")
-                .startAt(charSequence)
-                .endAt(charSequence + "\uf8ff");
+                                                .orderByChild("search")
+                                                .startAt(charSequence)
+                                                .endAt(charSequence + "\uf8ff");
 
         qrySearchUser.addValueEventListener(new ValueEventListener() {
             @Override
@@ -142,6 +139,7 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        getFriendsUid();
         searchFriends("");
     }
 }

@@ -12,11 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +45,6 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -57,11 +54,11 @@ public class ProfileFragment extends Fragment {
     private MaterialEditText inputStatus, inputBio;
     private Button btnUpdateProfile;
 
-    DatabaseReference reference;
+    DatabaseReference userReference;
     FirebaseUser fUser;
 
 //  Firebase Storage implementation
-    StorageReference storageReference;
+    StorageReference storageReference, previousImageLocation;
     private static final int IMAGE_REQUEST = 1;
     private Uri imageUri;
     private StorageTask uploadTask;
@@ -105,8 +102,8 @@ public class ProfileFragment extends Fragment {
 
 //      Load & update profile
         storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
-        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
-        reference.addValueEventListener(new ValueEventListener() {
+        userReference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
+        userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
@@ -128,7 +125,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("ProfileFragment", error.getMessage());
             }
         });
 
@@ -139,7 +136,7 @@ public class ProfileFragment extends Fragment {
             HashMap<String, Object> profile = new HashMap<>();
             profile.put("status", status);
             profile.put("bio", bio);
-            reference.updateChildren(profile);
+            userReference.updateChildren(profile);
         });
 
         imageProfile.setOnClickListener(view1 -> openImage());
@@ -186,12 +183,11 @@ public class ProfileFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
-                        reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
-                        deleteFile(reference, "imageURL");
+                        deleteFile(userReference, "imageURL");
 
-                        HashMap<String, Object> map = new HashMap<>();
-                        map.put("imageURL", mUri);
-                        reference.updateChildren(map);
+                        HashMap<String, Object> profileImageUrl = new HashMap<>();
+                        profileImageUrl.put("imageURL", mUri);
+                        userReference.updateChildren(profileImageUrl);
 
                         pd.dismiss();
                     } else {
@@ -231,9 +227,11 @@ public class ProfileFragment extends Fragment {
         previousImage.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) return;
-                StorageReference previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
-                previousImageLocation.delete();
+                String imageUrl = snapshot.getValue(String.class);
+                if (!imageUrl.equals("default")){
+                    previousImageLocation = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
+                    previousImageLocation.delete();
+                }
             }
 
             @Override

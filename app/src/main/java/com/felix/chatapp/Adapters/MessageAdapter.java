@@ -45,7 +45,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return new MessageAdapter.ViewHolder(chatBubble);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Chat chat = mChats.get(position);
@@ -57,7 +56,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             Glide.with(mContext).load(imageUrl).into(holder.profile_image);
         }
 
-//        Only need to show delivered/seen on chat_item_right. chat_item_left doesnt have text_seen
+//        Only need to show delivered/seen on chat_item_right. chat_item_left doesnt have text_seen, so text_seen should be null
         if (holder.text_seen == null) return;
         if (position == mChats.size() - 1) {
             if (chat.getIsSeen()) {

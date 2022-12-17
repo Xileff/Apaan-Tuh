@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,12 +31,11 @@ public class ChatsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserItemAdapter userItemAdapter;
-    private List<User> mUsers; // Will contain all the users whom we have chat with
+    private List<User> mUsers; // Will contain all the user models whom we have chat with
+    private List<String> chatUidList; // Will contain all id of the users whom we have chat with
 
     FirebaseUser fUser;
-    DatabaseReference reference;
-
-    private List<String> chatUidList; // Will contain all id of the users whom we have chat with
+    DatabaseReference chatsReference, usersReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,24 +53,21 @@ public class ChatsFragment extends Fragment {
         chatUidList = new ArrayList<>();
 
         if (isAdded() && getActivity() != null) {
-            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Chats");
+            chatsReference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Chats");
         }
 
-        reference.addValueEventListener(new ValueEventListener() {
+        chatsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 chatUidList.clear();
-
-//              Save every chat sender's id related to current user in chatUidList
+//              Save every chat sender's id whom we have chat with
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Chat chat = data.getValue(Chat.class);
+                    if (chat == null) return;
 
-                    assert chat != null;
                     if (chat.getSender().equals(fUser.getUid())) {
                         chatUidList.add(chat.getReceiver());
-                    }
-
-                    if (chat.getReceiver().equals(fUser.getUid())) {
+                    } else if (chat.getReceiver().equals(fUser.getUid())) {
                         chatUidList.add(chat.getSender());
                     }
 
@@ -80,7 +77,7 @@ public class ChatsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("ChatsFragment", error.getMessage());
             }
         });
 
@@ -91,10 +88,10 @@ public class ChatsFragment extends Fragment {
         mUsers = new ArrayList<>();
 
         if (isAdded() && getActivity() != null) {
-            reference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
+            usersReference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users");
         }
 
-        reference.addValueEventListener(new ValueEventListener() {
+        usersReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 mUsers.clear();
@@ -123,7 +120,7 @@ public class ChatsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("ChatsFragment", error.getMessage());
             }
         });
     }

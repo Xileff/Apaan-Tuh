@@ -2,6 +2,7 @@ package com.felix.chatapp.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,7 @@ public class UserItemAdapter extends RecyclerView.Adapter {
 
     private Context mContext;
     private List<User> mUsers;
-    private boolean isChat;
-
+    private boolean isChat; // to determine if this is ChatsFragment or no
     private String theLastMessage;
 
     public UserItemAdapter(Context mContext, List<User> mUsers, boolean isChat) {
@@ -79,9 +79,7 @@ public class UserItemAdapter extends RecyclerView.Adapter {
         return mUsers.size();
     }
 
-//    user_item.xml
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         public TextView name, lastMessage;
         public ImageView profileImage;
         public CircleImageView badge;
@@ -98,33 +96,27 @@ public class UserItemAdapter extends RecyclerView.Adapter {
     private void showLastMessage(String userId, TextView txtLastMessage, CircleImageView badge) {
         theLastMessage = "";
         FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
+        DatabaseReference chatsReference = FirebaseDatabase.getInstance("https://chatapp-fc0be-default-rtdb.asia-southeast1.firebasedatabase.app").getReference("Chats");
 
-        reference.addValueEventListener(new ValueEventListener() {
+        chatsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (fUser == null) return;
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Chat c = data.getValue(Chat.class);
-
-//                  Show last message
                     if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId) || c.getSender().equals(fUser.getUid()) && c.getReceiver().equals(userId)) {
                         theLastMessage = c.getMessage();
                     }
-
-//                  Show/hide badge
                     if (c.getReceiver().equals(fUser.getUid()) && c.getSender().equals(userId)) {
                         badge.setVisibility(c.getIsSeen() ? View.GONE : View.VISIBLE);
                     }
                 }
-
                 txtLastMessage.setText(theLastMessage);
-                theLastMessage = "";
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("UserItemAdapter", error.getMessage());
             }
         });
     }
