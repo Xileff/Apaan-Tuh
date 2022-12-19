@@ -44,11 +44,61 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- TODO : Make add/block menu if sender isnt a friend -->
+    <LinearLayout
+        android:id="@+id/menuAddFriend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bar_layout"
+        android:orientation="vertical"
+        android:background="@color/secondaryBackground"
+        android:visibility="gone"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="This user is not in your friends list. Add?"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            >
+            <Button
+                android:id="@+id/btnAddFriend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="5dp"
+                android:text="Add Friend"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimaryDark"
+                />
+            <Button
+                android:id="@+id/btnDontAdd"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="5dp"
+                android:text="Don't add"
+                android:textColor="@color/white"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/gray"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
 
     <ImageView
         android:id="@+id/messageBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/menuAddFriend"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
         android:background="@color/defaultBackground"
@@ -58,7 +108,7 @@
         android:id="@+id/messageRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/bar_layout"
+        android:layout_below="@id/menuAddFriend"
         android:layout_above="@id/messageInputContainer"
         android:background="@android:color/transparent"
         />

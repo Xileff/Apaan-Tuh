@@ -14,9 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.felix.chatapp.Adapters.MessageAdapter;
 import com.felix.chatapp.Models.Chat;
 import com.felix.chatapp.Models.User;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,6 +41,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -58,6 +62,9 @@ public class MessageActivity extends AppCompatActivity {
     private TextView name;
     private ImageButton btnSend;
     private EditText inputMessage;
+    private LinearLayout menuAddFriend;
+    private Button btnAddFriend, btnDontAdd;
+    private boolean isAdded;
 
     private FirebaseUser fUser;
     private FirebaseDatabase db;
@@ -97,6 +104,56 @@ public class MessageActivity extends AppCompatActivity {
         setupToolbar();
         setupViews();
 
+//      Check if receiver is already added as friend
+        isAdded = false;
+        Query qryUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                .getReference("Users")
+                .child(fUser.getUid())
+                .child("friends")
+                .child(userId);
+        qryUser.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    menuAddFriend.setVisibility(View.VISIBLE);
+                } else {
+                    isAdded = true;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d(ACTIVITY_TAG, error.getMessage());
+            }
+        });
+
+        btnAddFriend.setOnClickListener(view -> {
+            DatabaseReference newFriendRef = db.getReference("Users")
+                                                .child(fUser.getUid())
+                                                .child("friends")
+                                                .child(userId);
+
+            HashMap<String, String> friendData = new HashMap<>();
+            friendData.put("id", userId);
+            friendData.put("backgroundUri", "");
+
+            newFriendRef.setValue(friendData).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(MessageActivity.this, "Couldn't add, please try again shortly", Toast.LENGTH_SHORT).show();
+                    Log.d(ACTIVITY_TAG, task.getException().toString());
+                    return;
+                }
+
+                Toast.makeText(MessageActivity.this,"Added succesfully", Toast.LENGTH_SHORT).show();
+                isAdded = true;
+                menuAddFriend.setVisibility(View.GONE);
+            });
+        });
+
+        btnDontAdd.setOnClickListener(view -> {
+            menuAddFriend.setVisibility(View.GONE);
+        });
+
 //      Get receiver profile and read all messages
         receiverReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -124,12 +181,11 @@ public class MessageActivity extends AppCompatActivity {
         });
 
 //      Get background
-        backgroundReference = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
-                .getReference("Users")
-                .child(fUser.getUid())
-                .child("friends")
-                .child(userId)
-                .child("backgroundUri");
+        backgroundReference = db.getReference("Users")
+                                .child(fUser.getUid())
+                                .child("friends")
+                                .child(userId)
+                                .child("backgroundUri");
         backgroundReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -329,11 +385,37 @@ public class MessageActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_activity_message, menu);
         return true;
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (isAdded) {
+            menu.findItem(R.id.menu_remove_friend).setVisible(true);
+        } else {
+            menu.findItem(R.id.menu_remove_friend).setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_change_background:
                 openImage();
+                return true;
+            case R.id.menu_remove_friend:
+                DatabaseReference friendRef = db.getReference("Users")
+                        .child(fUser.getUid())
+                        .child("friends")
+                        .child(userId);
+
+                friendRef.removeValue().addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(MessageActivity.this, "Couldn't remove, please try again.", Toast.LENGTH_SHORT).show();
+                        Log.d(ACTIVITY_TAG, task.getException().toString());
+                    }
+                    Toast.makeText(MessageActivity.this, "Removed succesfully.", Toast.LENGTH_SHORT).show();
+                    isAdded = false;
+                });
                 return true;
         }
 
@@ -374,5 +456,8 @@ public class MessageActivity extends AppCompatActivity {
         name = findViewById(R.id.profileName);
         inputMessage = findViewById(R.id.inputMessage);
         btnSend = findViewById(R.id.btnSend);
+        menuAddFriend = findViewById(R.id.menuAddFriend);
+        btnAddFriend = findViewById(R.id.btnAddFriend);
+        btnDontAdd = findViewById(R.id.btnDontAdd);
     }
 }
