@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 
 public class AboutDevActivity extends AppCompatActivity {
 
-    ImageButton btnLinkedIn;
+    private ImageButton btnLinkedIn;
     final String url = "https://www.linkedin.com/in/felixsavero/";
 
     @Override
@@ -24,7 +24,10 @@ public class AboutDevActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("About developer");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(AboutDevActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(
+                                                    AboutDevActivity.this,
+                                                                MainActivity.class)
+                                                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
 
         btnLinkedIn = findViewById(R.id.btn_dev_linkedin);
 

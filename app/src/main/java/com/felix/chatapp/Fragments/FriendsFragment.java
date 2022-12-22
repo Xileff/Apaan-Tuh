@@ -77,13 +77,15 @@ public class FriendsFragment extends Fragment {
         return view;
     }
 
-//  Invoked in create cycle, to store friends uid in a list
+//  Invoked in start cycle, to store friends uid in a list
     private void getFriendsUid() {
         Query qryFriends;
         friendUidList = new ArrayList<>();
 
         if (isAdded() && getActivity() != null) {
-            qryFriends = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid()).child("friends");
+            qryFriends = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users")
+                                                                                                        .child(fUser.getUid())
+                                                                                                        .child("friends");
 
             qryFriends.addValueEventListener(new ValueEventListener() {
                 @Override

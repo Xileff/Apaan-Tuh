@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    tools:context=".UserProfile">
+    android:background="@drawable/chatbackground"
+    tools:context=".UserProfileActivity">
 
     <include
         layout="@layout/bar_layout"
@@ -45,14 +46,40 @@
             />
 
         <TextView
-            android:id="@+id/profileStatus"
+            android:id="@+id/titleProfileStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/profileName"
             android:layout_centerHorizontal="true"
-            android:layout_marginVertical="15dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="Status"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            />
+
+        <TextView
+            android:id="@+id/profileStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/titleProfileStatus"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
             android:textColor="@color/black"
             android:text="status"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            />
+
+        <TextView
+            android:id="@+id/titleProfileBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profileStatus"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="Bio"
             android:textAlignment="center"
             android:textStyle="bold"
             android:textSize="18sp"
@@ -62,9 +89,8 @@
             android:id="@+id/profileBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/profileStatus"
+            android:layout_below="@id/titleProfileBio"
             android:layout_centerHorizontal="true"
-            android:layout_marginVertical="15dp"
             android:text="bio"
             android:textAlignment="center"
             android:textColor="@color/black"

@@ -86,7 +86,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
     }
 
-    //    Used to hold user_item.xml
+    //    Used to hold chat_item_left/right.xml
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView showMessage;

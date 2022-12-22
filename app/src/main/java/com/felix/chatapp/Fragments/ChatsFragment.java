@@ -37,6 +37,11 @@ public class ChatsFragment extends Fragment {
     FirebaseUser fUser;
     DatabaseReference chatsReference, usersReference;
 
+//  1. Collect all users id whom have chat with us -> chatUidList
+//  2. Collect all users model whom have their id listed in chatUidList -> mUsers
+//  3. Make userItemAdapter with mUsers
+//  4. Use userItemAdapter as adapter for recyclerView
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

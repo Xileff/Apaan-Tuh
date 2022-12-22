@@ -93,7 +93,7 @@
         </LinearLayout>
     </LinearLayout>
 
-
+    <!-- Background Image   -->
     <ImageView
         android:id="@+id/messageBackground"
         android:layout_width="match_parent"
@@ -104,6 +104,7 @@
         android:background="@color/defaultBackground"
         />
 
+    <!-- Chats  -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messageRecyclerView"
         android:layout_width="match_parent"
@@ -113,6 +114,7 @@
         android:background="@android:color/transparent"
         />
 
+    <!--  Input and send button4  -->
     <RelativeLayout
         android:id="@+id/messageInputContainer"
         android:layout_width="match_parent"

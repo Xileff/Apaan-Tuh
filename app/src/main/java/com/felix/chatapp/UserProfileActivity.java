@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -18,7 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserProfile extends AppCompatActivity {
+public class UserProfileActivity extends AppCompatActivity {
 
     private CircleImageView profileImage;
     private TextView name, status, bio;
@@ -35,7 +36,9 @@ public class UserProfile extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(view -> {
-            startActivity(new Intent(UserProfile.this, MessageActivity.class).putExtra("userId", userId).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            startActivity(new Intent(UserProfileActivity.this, MessageActivity.class)
+                            .putExtra("userId", userId)
+                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         });
 
         profileImage = findViewById(R.id.profileImage);
@@ -43,7 +46,9 @@ public class UserProfile extends AppCompatActivity {
         status = findViewById(R.id.profileStatus);
         bio = findViewById(R.id.profileBio);
 
-        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users").child(userId);
+        reference = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
+                                    .getReference("Users")
+                                    .child(userId);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -51,7 +56,7 @@ public class UserProfile extends AppCompatActivity {
                 getSupportActionBar().setTitle(user.getName());
 
                 if (!user.getImageURL().equals("default")) {
-                    Glide.with(UserProfile.this).load(user.getImageURL()).into(profileImage);
+                    Glide.with(UserProfileActivity.this).load(user.getImageURL()).into(profileImage);
                 }
                 name.setText(user.getName());
                 status.setText(user.getStatus());
@@ -60,7 +65,7 @@ public class UserProfile extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("UserProfileActivity", error.getMessage());
             }
         });
     }

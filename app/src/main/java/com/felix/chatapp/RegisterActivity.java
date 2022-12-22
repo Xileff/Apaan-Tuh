@@ -51,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
             } else if (password.length() < 8) {
                 Toast.makeText(RegisterActivity.this, "Password must be at least 8 characters", Toast.LENGTH_SHORT).show();
             } else if (!username.matches("[a-z0-9]{8,20}")) {
-                Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain lowercase alphabet with numbers", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "Username must be between 8-20 characters, and contain only lowercase alphabet with or without numbers", Toast.LENGTH_LONG).show();
             } else {
 
 //                  todo : Make username unique
@@ -98,11 +98,11 @@ public class RegisterActivity extends AppCompatActivity {
             newUser.put("id", userId);
             newUser.put("name", name);
             newUser.put("username", username);
-            newUser.put("search", username.toLowerCase(Locale.ROOT));
+            newUser.put("search", name.toLowerCase(Locale.ROOT));
             newUser.put("imageURL", "default");
             newUser.put("friends", "");
-            newUser.put("status", "");
-            newUser.put("bio", "");
+            newUser.put("status", "No status");
+            newUser.put("bio", "No bio");
 
             userReference.setValue(newUser).addOnCompleteListener(task1 -> {
                 if (task1.isSuccessful()) {
@@ -131,4 +131,3 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
     }
 }
-//

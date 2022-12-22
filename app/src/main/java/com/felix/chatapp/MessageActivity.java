@@ -30,7 +30,6 @@ import com.bumptech.glide.Glide;
 import com.felix.chatapp.Adapters.MessageAdapter;
 import com.felix.chatapp.Models.Chat;
 import com.felix.chatapp.Models.User;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -206,7 +205,7 @@ public class MessageActivity extends AppCompatActivity {
 
 //      If we click on receiver's name or image, show their complete profile
         for (View v : new View[]{profileImage, name}) {
-            v.setOnClickListener(view -> startActivity(new Intent(MessageActivity.this, UserProfile.class).putExtra("userId", userId)));
+            v.setOnClickListener(view -> startActivity(new Intent(MessageActivity.this, UserProfileActivity.class).putExtra("userId", userId)));
         }
 
 //      Send message
@@ -380,6 +379,23 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+    public void deleteFile(DatabaseReference reference, String key) {
+        DatabaseReference previousImageUri = reference.child(key);
+        previousImageUri.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) return;
+                StorageReference previousImage = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
+                previousImage.delete();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d(ACTIVITY_TAG, error.getMessage());
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_activity_message, menu);
@@ -422,29 +438,16 @@ public class MessageActivity extends AppCompatActivity {
         return false;
     }
 
-    public void deleteFile(DatabaseReference reference, String key) {
-        DatabaseReference previousImageUri = reference.child(key);
-        previousImageUri.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) return;
-                StorageReference previousImage = FirebaseStorage.getInstance().getReferenceFromUrl(snapshot.getValue(String.class));
-                previousImage.delete();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d(ACTIVITY_TAG, error.getMessage());
-            }
-        });
-    }
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(MessageActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(
+                                            MessageActivity.this,
+                                                    MainActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 
     private void setupViews() {

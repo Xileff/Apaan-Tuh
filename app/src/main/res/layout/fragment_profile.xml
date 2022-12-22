@@ -4,81 +4,90 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="8dp"
+    android:padding="16dp"
     android:background="@android:color/transparent"
-    tools:context=".Fragments.ProfileFragment">
+    tools:context=".Fragments.ProfileFragment"
+    >
 
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="match_parent">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="50dp"
-            app:civ_border_color="@color/colorPrimaryDark"
-            app:civ_border_width="0.8dp"
-            android:src="@drawable/nophoto_white"/>
-
-        <TextView
-            android:id="@+id/profileName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileImage"
-            android:layout_centerHorizontal="true"
-            android:layout_marginVertical="15dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="Name"
-            android:textAlignment="center"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            />
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/inputStatus"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/profileName"
-            android:layout_centerHorizontal="true"
-            android:layout_marginVertical="15dp"
-            android:hint="Status"
-            app:met_floatingLabel="normal"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            />
+            android:layout_height="match_parent">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/inputBio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/inputStatus"
-            android:layout_centerHorizontal="true"
-            android:layout_marginVertical="15dp"
-            android:hint="Bio"
-            app:met_floatingLabel="normal"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:lines="5"
-            />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="50dp"
+                app:civ_border_color="@color/colorPrimaryDark"
+                app:civ_border_width="0.8dp"
+                android:src="@drawable/nophoto_white"/>
 
-        <Button
-            android:id="@+id/btnUpdateProfile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/inputBio"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/rounded_corners"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:text="Update profile"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            />
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/profileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileImage"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="15dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:hint="Name"
+                android:text="Name"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                app:met_textColor="@color/colorPrimaryDark"
+                app:met_floatingLabel="normal"
+                />
 
-    </RelativeLayout>
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/inputStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/profileName"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="15dp"
+                android:hint="Status"
+                app:met_floatingLabel="normal"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/inputBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/inputStatus"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="15dp"
+                android:hint="Bio"
+                app:met_floatingLabel="normal"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:lines="5"
+                />
+
+            <Button
+                android:id="@+id/btnUpdateProfile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/inputBio"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/rounded_corners"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:text="Update profile"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                />
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

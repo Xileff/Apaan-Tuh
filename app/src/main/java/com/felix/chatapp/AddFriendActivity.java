@@ -68,7 +68,7 @@ public class AddFriendActivity extends AppCompatActivity {
 
             Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
                     .getReference("Users")
-                    .orderByChild("search")
+                    .orderByChild("username")
                     .limitToFirst(1)
                     .equalTo(search);
 
@@ -91,6 +91,12 @@ public class AddFriendActivity extends AppCompatActivity {
                     name.setText(user.getName());
                     status.setText(user.getStatus());
                     bio.setText(user.getBio());
+                    if (!user.getImageURL().equals("default")) {
+                        Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
+                    } else {
+                        profileImage.setImageResource(R.drawable.nophoto_white);
+                    }
+                    showLayoutFound();
 
                     Query qryUser = FirebaseDatabase.getInstance(getString(R.string.databaseURL))
                                         .getReference("Users")
@@ -102,26 +108,12 @@ public class AddFriendActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
-                                showLayoutFound();
-
-                                if (!user.getImageURL().equals("default")) {
-                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
-                                } else {
-                                    profileImage.setImageResource(R.drawable.nophoto_white);
-                                }
                                 Toast.makeText(AddFriendActivity.this, search + " is already your friend", Toast.LENGTH_SHORT).show();
                                 showChatButton();
                             }
 
                             else {
                                 showAddButton();
-                                if (user.getImageURL().equals("default")) {
-                                    profileImage.setImageResource(R.drawable.nophoto);
-                                }
-                                else {
-                                    Glide.with(AddFriendActivity.this).load(user.getImageURL()).into(profileImage);
-                                }
-                                showLayoutFound();
                             }
                         }
 
@@ -171,11 +163,6 @@ public class AddFriendActivity extends AppCompatActivity {
     private void showLayoutFound(){
         layoutFound.setVisibility(View.VISIBLE);
         layoutNotFound.setVisibility(View.GONE);
-
-        ObjectAnimator animation = ObjectAnimator.ofFloat(layoutFound, "translationY", 100f);
-        animation.setDuration(1000);
-        animation.start();
-
         closeKeyboard();
     }
 
@@ -183,11 +170,6 @@ public class AddFriendActivity extends AppCompatActivity {
         layoutFound.setVisibility(View.GONE);
         layoutNotFound.setVisibility(View.VISIBLE);
         closeKeyboard();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     private void setupViews() {
@@ -208,7 +190,10 @@ public class AddFriendActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Add friend");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(AddFriendActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        toolbar.setNavigationOnClickListener(view -> startActivity(new Intent(
+                                        AddFriendActivity.this,
+                                                    MainActivity.class)
+                                                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)));
     }
 
     private void showAddButton() {
@@ -229,4 +214,3 @@ public class AddFriendActivity extends AppCompatActivity {
         }
     }
 }
-//

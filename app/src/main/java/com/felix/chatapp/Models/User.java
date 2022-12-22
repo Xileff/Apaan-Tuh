@@ -1,9 +1,9 @@
 package com.felix.chatapp.Models;
 
 public class User {
-    private String id, name, username, imageURL, status, search, token, bio;
+    private String id, name, username, imageURL, status, search, bio;
 
-    public User(String id, String name, String username, String imageURL, String status, String bio, String search, String token) {
+    public User(String id, String name, String username, String imageURL, String status, String bio, String search) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -11,7 +11,6 @@ public class User {
         this.status = status;
         this.bio = bio;
         this.search = search;
-        this.token = token;
     }
 
     public User() {
@@ -72,13 +71,5 @@ public class User {
 
     public void setSearch(String search) {
         this.search = search;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 }

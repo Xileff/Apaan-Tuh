@@ -35,4 +35,3 @@ public class StartActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(view -> startActivity(new Intent(StartActivity.this, RegisterActivity.class)));
     }
 }
-//

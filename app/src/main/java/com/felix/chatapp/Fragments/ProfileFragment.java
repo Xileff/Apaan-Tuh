@@ -45,13 +45,13 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment {
     private CircleImageView imageProfile;
-    private TextView name;
-    private MaterialEditText inputStatus, inputBio;
+    private MaterialEditText inputName, inputStatus, inputBio;
     private Button btnUpdateProfile;
 
     DatabaseReference userReference;
@@ -71,13 +71,14 @@ public class ProfileFragment extends Fragment {
         fUser = FirebaseAuth.getInstance().getCurrentUser();
 
         imageProfile = view.findViewById(R.id.profileImage);
-        name = view.findViewById(R.id.profileName);
+        inputName = view.findViewById(R.id.profileName);
         inputStatus = view.findViewById(R.id.inputStatus);
         inputBio = view.findViewById(R.id.inputBio);
         btnUpdateProfile = view.findViewById(R.id.btnUpdateProfile);
 
 //      Set button update to visible
         ArrayList<MaterialEditText> inputs = new ArrayList<>();
+        inputs.add(inputName);
         inputs.add(inputStatus);
         inputs.add(inputBio);
 
@@ -102,14 +103,16 @@ public class ProfileFragment extends Fragment {
 
 //      Load & update profile
         storageReference = FirebaseStorage.getInstance().getReference("Uploads/profileImage");
-        userReference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL)).getReference("Users").child(fUser.getUid());
+        userReference = FirebaseDatabase.getInstance(requireContext().getString(R.string.databaseURL))
+                        .getReference("Users")
+                        .child(fUser.getUid());
         userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 if (user == null) return;
 
-                name.setText(user.getName());
+                inputName.setText(user.getName());
                 inputBio.setText(user.getBio());
                 inputStatus.setText(user.getStatus());
                 btnUpdateProfile.setVisibility(View.GONE);
@@ -130,12 +133,15 @@ public class ProfileFragment extends Fragment {
         });
 
         btnUpdateProfile.setOnClickListener(view1 -> {
+            String name = inputName.getText().toString();
             String status = inputStatus.getText().toString();
             String bio = inputBio.getText().toString();
 
             HashMap<String, Object> profile = new HashMap<>();
+            profile.put("name", name);
             profile.put("status", status);
             profile.put("bio", bio);
+            profile.put("search", name.toLowerCase(Locale.ROOT));
             userReference.updateChildren(profile);
         });
 
@@ -174,17 +180,20 @@ public class ProfileFragment extends Fragment {
                     }
 
                     return fileReference.getDownloadUrl();
+//                  Upload then return Task<Uri>
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
-//                  Delete previous image and upload new image
                     if (task.isSuccessful()) {
+//                      Get uri of the uploaded image in Firebase
                         Uri downloadUri = task.getResult();
                         String mUri = downloadUri.toString();
 
+//                      Delete previous image
                         deleteFile(userReference, "imageURL");
 
+//                      Save the new uri in user record
                         HashMap<String, Object> profileImageUrl = new HashMap<>();
                         profileImageUrl.put("imageURL", mUri);
                         userReference.updateChildren(profileImageUrl);
