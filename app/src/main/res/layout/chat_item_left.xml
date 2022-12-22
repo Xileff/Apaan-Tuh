@@ -20,6 +20,8 @@
         android:layout_toEndOf="@+id/profileImage"
         android:background="@drawable/chat_bubble_left"
         android:text="Hello"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        />
 
 </RelativeLayout>

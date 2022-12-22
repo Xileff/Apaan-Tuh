@@ -27,10 +27,11 @@
             android:id="@+id/title_about_dev"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Developer Profile"
+            android:text="Felix Savero"
             android:textSize="30sp"
             android:textStyle="bold"
             android:textAlignment="center"
+            android:textColor="@color/black"
             />
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -48,6 +49,7 @@
             android:text="Hello, my name is Felix Savero.\n\nI am an IT undergraduate student at Ukrida.\n\nI am passionate about computer technology, and my hobby is building PC.\n\nI am also interested in exploring new ideas and finding ways to apply them to the field of IT. I am very excited to be part of this program, and I am looking forward to the opportunities it will bring\n\nYou can find me on LinkedIn below"
             android:textSize="18sp"
             android:textAlignment="center"
+            android:textColor="@color/black"
             />
 
         <ImageButton

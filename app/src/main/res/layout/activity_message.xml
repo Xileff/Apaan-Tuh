@@ -59,6 +59,7 @@
             android:text="This user is not in your friends list. Add?"
             android:textAlignment="center"
             android:textSize="18sp"
+            android:textColor="@color/black"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -130,6 +131,7 @@
             android:layout_centerVertical="true"
             android:layout_toStartOf="@id/btnSend"
             android:background="@android:color/transparent"
+            android:textColor="@color/black"
             android:hint="Type a message"/>
 
         <ImageButton
