@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.felix.chatapp.Adapters.UserItemAdapter;
 import com.felix.chatapp.Models.Chat;
@@ -31,6 +32,7 @@ public class ChatsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private UserItemAdapter userItemAdapter;
+    private LinearLayout noChat;
     private List<User> mUsers; // Will contain all the user models whom we have chat with
     private List<String> chatUidList; // Will contain all id of the users whom we have chat with
 
@@ -49,6 +51,7 @@ public class ChatsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
+        noChat = view.findViewById(R.id.noChats);
 
         if (isAdded() && getActivity() != null) {
             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -120,6 +123,15 @@ public class ChatsFragment extends Fragment {
                 if (isAdded() && getActivity() != null) {
                     userItemAdapter = new UserItemAdapter(requireContext(), mUsers, true);
                     recyclerView.setAdapter(userItemAdapter);
+                }
+
+//              Show no chat picture, if there is no chat
+                if (mUsers.size() > 0) {
+                    noChat.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                } else {
+                    noChat.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 }
             }
 
