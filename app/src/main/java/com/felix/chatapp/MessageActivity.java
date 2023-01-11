@@ -317,12 +317,6 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
-    private String getFileExtension(Uri uri) {
-        ContentResolver contentResolver = getContentResolver();
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
-    }
-
     private void uploadImage() {
         final ProgressDialog pd = new ProgressDialog(MessageActivity.this);
         pd.setMessage("Uploading");
@@ -353,9 +347,9 @@ public class MessageActivity extends AppCompatActivity {
                     String mUri = downloadUri.toString();
 
                     DatabaseReference myFriendUidRef = db.getReference("Users")
-                                                        .child(fUser.getUid())
-                                                        .child("friends")
-                                                        .child(userId);
+                            .child(fUser.getUid())
+                            .child("friends")
+                            .child(userId);
                     deleteFile(myFriendUidRef, "backgroundUri");
 
                     HashMap<String, Object> map = new HashMap<>();
@@ -377,6 +371,12 @@ public class MessageActivity extends AppCompatActivity {
                 pd.dismiss();
             }
         });
+    }
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
     public void deleteFile(DatabaseReference reference, String key) {

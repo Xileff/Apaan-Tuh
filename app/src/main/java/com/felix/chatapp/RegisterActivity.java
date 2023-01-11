@@ -56,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 //                  todo : Make username unique
                 Query query = FirebaseDatabase.getInstance(getString(R.string.databaseURL)).getReference("Users")
-                        .orderByChild("search")
+                        .orderByChild("username")
                         .limitToFirst(1)
                         .equalTo(username);
 

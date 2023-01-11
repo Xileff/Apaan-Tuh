@@ -41,8 +41,6 @@ public class ChatsFragment extends Fragment {
 
 //  1. Collect all users id whom have chat with us -> chatUidList
 //  2. Collect all users model whom have their id listed in chatUidList -> mUsers
-//  3. Make userItemAdapter with mUsers
-//  4. Use userItemAdapter as adapter for recyclerView
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -116,7 +114,7 @@ public class ChatsFragment extends Fragment {
                         continue;
                     }
 
-//                  If had chat & musers isnt empty, make sure no duplicate
+//                  If had chat & mUsers isnt empty, make sure no duplicate
                     if (!mUsers.contains(user)) mUsers.add(user);
                 }
 
@@ -125,7 +123,7 @@ public class ChatsFragment extends Fragment {
                     recyclerView.setAdapter(userItemAdapter);
                 }
 
-//              Show no chat picture, if there is no chat
+//              If there is no chat, then show the "No chat" ImageView
                 if (mUsers.size() > 0) {
                     noChat.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
